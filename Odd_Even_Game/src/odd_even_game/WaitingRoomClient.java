@@ -7,17 +7,18 @@ import java.util.Scanner;
 public class WaitingRoomClient {
 
 	public static void main(String[] args) {
-		if(args.length != 1) {
-			System.out.println("USAGE : java WaitingRoomClient nickname");
-			System.exit(0);
-		}
+		Scanner keyboard = new Scanner(System.in);
+		
+		String nickName;
+		
+		nickName = keyboard.nextLine();
 		
 		try {
 			String serverIp = "127.0.0.1";
 			int nPort = 21118;
 			Socket clientSocket = new Socket(serverIp, nPort);
 			System.out.println("Connected to Server");
-			Thread sender = new Thread(new ClientSender(clientSocket, args[0]));
+			Thread sender = new Thread(new ClientSender(clientSocket, nickName));
 			Thread receiver = new Thread(new ClientReceiver(clientSocket));
 			
 			sender.start();
