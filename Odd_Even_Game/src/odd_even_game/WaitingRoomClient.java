@@ -44,7 +44,7 @@ public class WaitingRoomClient {
 			Scanner keyboard = new Scanner(System.in);
 			try {
 				if(out != null) {
-					out.writeUTF(name);
+					out.writeUTF(name); // 처음 닉네임 send
 				}
 				
 				while(out != null) {

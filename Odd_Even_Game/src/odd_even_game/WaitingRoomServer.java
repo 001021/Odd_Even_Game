@@ -5,11 +5,17 @@ import java.io.*;
 import java.util.*;
 
 public class WaitingRoomServer {
-	HashMap<String, Object> users;
+	RoomManager roomManger;
+	static HashMap<String, Object> users;
+	ArrayList<GameUser> userList;
+
 	
 	WaitingRoomServer() {
 		users = new HashMap<String, Object>();
 		Collections.synchronizedMap(users);
+		
+		userList = new ArrayList<GameUser>();
+		roomManger = new RoomManager();
 	}
 	
 	public void start() {
@@ -69,6 +75,17 @@ public class WaitingRoomServer {
 				sendToAll("#" + name + " came in");
 				
 				users.put(name, out);
+				userList.add(new GameUser(name, socket));	// GameUser arrayList¿¡ Ãß°¡
+				if (userList.size() % 2 == 0) {
+					roomManger.CreateRoom(userList.get(0), userList.get(1));
+					
+					DataOutputStream welcome = new DataOutputStream(userList.get(0).socket.getOutputStream());
+					welcome.writeUTF(userList.get(0).nickName + " vs " + userList.get(1).nickName);
+					
+					welcome = new DataOutputStream(userList.get(1).socket.getOutputStream());
+					welcome.writeUTF(userList.get(0).nickName + " vs " + userList.get(1).nickName);
+				}
+				
 				System.out.println("The current number of server users : " + users.size());
 				
 				while(in != null) {
@@ -83,6 +100,34 @@ public class WaitingRoomServer {
 						socket.getPort() + "] connection closed");
 				System.out.println("The current number of server users : " + users.size());
 			}
+		}
+	}
+	
+	public static class RoomManager {
+		static List<GameRoom> roomList;
+		
+		RoomManager(){
+			roomList = new ArrayList<GameRoom>();
+		}
+		
+		GameRoom CreateRoom(GameUser user1, GameUser user2) {
+			GameRoom room = new GameRoom();
+			roomList.add(room);
+			System.out.println("Room Created!");
+			
+			users.remove(user1.nickName);
+			users.remove(user2.nickName);
+			
+			return room;
+		}
+		
+		public static void RemoveRoom(GameRoom room) {
+			roomList.remove(room);
+			System.out.println("Room Deleted!");
+		}
+		
+		public int RoomCount(){
+			return roomList.size();
 		}
 	}
 }
