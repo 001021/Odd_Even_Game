@@ -16,6 +16,13 @@ public class GameRoom {
 		userList = new ArrayList<GameUser>();
 		userList.add(user1);
 		userList.add(user2);
+		
+		try {
+			user1.out.writeUTF("Welcome");
+			user2.out.writeUTF("Welcome");
+		} catch (IOException e) {}
+		
+		
 	}
 	
 	public void ExitGame(GameUser user) {

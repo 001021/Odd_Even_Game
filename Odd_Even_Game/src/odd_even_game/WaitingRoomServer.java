@@ -6,15 +6,16 @@ import java.util.*;
 
 public class WaitingRoomServer {
 	RoomManager roomManger;
-	static HashMap<String, Object> users;
-	ArrayList<GameUser> userList;
+	
+	static HashMap<String, Object> userSocket;	// user outputStream 모아놓은 hashMap
+	static ArrayList<GameUser> waitingList;		// 대기실에 waiting List
 
 	
 	WaitingRoomServer() {
-		users = new HashMap<String, Object>();
-		Collections.synchronizedMap(users);
+		userSocket = new HashMap<String, Object>();
+		Collections.synchronizedMap(userSocket);
 		
-		userList = new ArrayList<GameUser>();
+		waitingList = new ArrayList<GameUser>();
 		roomManger = new RoomManager();
 	}
 	
@@ -40,11 +41,11 @@ public class WaitingRoomServer {
 	}
 		
 	void sendToAll(String msg) {
-		Iterator<String> it = users.keySet().iterator();
+		Iterator<String> it = userSocket.keySet().iterator();
 		
 		while(it.hasNext()) {
 			try {
-				DataOutputStream out = (DataOutputStream)users.get(it.next());
+				DataOutputStream out = (DataOutputStream)userSocket.get(it.next());
 				out.writeUTF(msg);
 			} catch(IOException e) {}
 		}
@@ -54,7 +55,7 @@ public class WaitingRoomServer {
 		new WaitingRoomServer().start();
 	}
 	
-	class ServerReceiver extends Thread{
+	class ServerReceiver extends Thread{	// Server Receiver 유저들의 채팅 받는 곳
 		Socket socket;
 		DataInputStream in;
 		DataOutputStream out;
@@ -74,19 +75,13 @@ public class WaitingRoomServer {
 				name = in.readUTF();
 				sendToAll("#" + name + " came in");
 				
-				users.put(name, out);
-				userList.add(new GameUser(name, socket));	// GameUser arrayList에 추가
-				if (userList.size() % 2 == 0) {
-					roomManger.CreateRoom(userList.get(0), userList.get(1));
-					
-					DataOutputStream welcome = new DataOutputStream(userList.get(0).socket.getOutputStream());
-					welcome.writeUTF(userList.get(0).nickName + " vs " + userList.get(1).nickName);
-					
-					welcome = new DataOutputStream(userList.get(1).socket.getOutputStream());
-					welcome.writeUTF(userList.get(0).nickName + " vs " + userList.get(1).nickName);
+				userSocket.put(name, out);
+				waitingList.add(new GameUser(name, socket));	// GameUser arrayList에 추가
+				if (waitingList.size() % 2 == 0) {
+					roomManger.CreateRoom(waitingList.get(0), waitingList.get(1));
 				}
 				
-				System.out.println("The current number of server users : " + users.size());
+				System.out.println("The current number of server users : " + userSocket.size());
 				
 				while(in != null) {
 					sendToAll(in.readUTF());
@@ -95,10 +90,10 @@ public class WaitingRoomServer {
 				
 			} finally {
 				sendToAll("#" + name + " left");
-				users.remove(name);
+				userSocket.remove(name);
 				System.out.println("[" + socket.getInetAddress() + " : " +
 						socket.getPort() + "] connection closed");
-				System.out.println("The current number of server users : " + users.size());
+				System.out.println("The current number of server users : " + userSocket.size());
 			}
 		}
 	}
@@ -111,12 +106,12 @@ public class WaitingRoomServer {
 		}
 		
 		GameRoom CreateRoom(GameUser user1, GameUser user2) {
-			GameRoom room = new GameRoom();
+			GameRoom room = new GameRoom(user1, user2);
 			roomList.add(room);
 			System.out.println("Room Created!");
 			
-			users.remove(user1.nickName);
-			users.remove(user2.nickName);
+			waitingList.remove(user1);
+			waitingList.remove(user2);
 			
 			return room;
 		}

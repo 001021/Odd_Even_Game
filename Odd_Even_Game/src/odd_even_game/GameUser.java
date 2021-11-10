@@ -25,16 +25,11 @@ public class GameUser {
 	public GameUser(String nickName, Socket socket) {
 		this.nickName = nickName;
 		this.socket = socket;
-		try {
-			in = new DataInputStream(socket.getInputStream());
-			out = new DataOutputStream(socket.getOutputStream());
-		} catch(IOException e) {}
 		
-		while (in != null) {
-			try {
-				System.out.println(in.readUTF());
-			} catch(IOException e) {}
-		}
+		try {
+			this.in = new DataInputStream(socket.getInputStream());
+			this.out = new DataOutputStream(socket.getOutputStream());
+		} catch(IOException e) {}
 	}
 	
 	public GameUser(int id, String nickName) {

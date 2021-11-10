@@ -11,6 +11,7 @@ public class WaitingRoomClient {
 		
 		String nickName;
 		
+		System.out.println("Write your nickName : ");
 		nickName = keyboard.nextLine();
 		
 		try {
@@ -23,6 +24,7 @@ public class WaitingRoomClient {
 			
 			sender.start();
 			receiver.start();
+			
 		} catch(ConnectException ce) {
 			ce.printStackTrace();
 		} catch(Exception e) {}
