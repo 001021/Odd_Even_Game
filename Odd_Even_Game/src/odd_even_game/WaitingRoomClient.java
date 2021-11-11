@@ -24,7 +24,6 @@ public class WaitingRoomClient {
 			
 			sender.start();
 			receiver.start();
-			
 		} catch(ConnectException ce) {
 			ce.printStackTrace();
 		} catch(Exception e) {}
@@ -38,7 +37,7 @@ public class WaitingRoomClient {
 		ClientSender(Socket socket, String name){
 			this.socket = socket;
 			try {
-				out = new DataOutputStream(socket.getOutputStream());
+				this.out = new DataOutputStream(socket.getOutputStream());
 				this.name = name;
 			} catch(Exception e) {}
 		}

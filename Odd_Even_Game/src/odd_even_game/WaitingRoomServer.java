@@ -98,8 +98,9 @@ public class WaitingRoomServer {
 						sendToAll(in.readUTF());
 					else
 						for(int i=0; i < RoomManager.roomList.size(); i++) {
-							if (RoomManager.roomList.get(i).userList.get(0).nickName == name || RoomManager.roomList.get(i).userList.get(1).nickName == name) {
+							if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
 								sendToGameRoom(in.readUTF(), RoomManager.roomList.get(i));
+								break;
 							}
 						}
 				}
