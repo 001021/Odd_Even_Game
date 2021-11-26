@@ -56,6 +56,7 @@ public class LoginFrame extends JFrame {
 		add(logBtn);
 		add(joinBtn);
 
+		// Login Button action
 		logBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e2) {
@@ -67,9 +68,9 @@ public class LoginFrame extends JFrame {
 						array=s.split("/");
 					if(txtID.getText().equals(array[0])&&txtPass.getText().equals(array[1]))
 					{
-						JOptionPane.showMessageDialog(null, txtID + "님, 안녕하세요!");
+						JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
 						// User가 로그인 했을 때 뜨는 창으로 연결
-						new UserFrame();
+						new WaitRoomFrame();
 					}
 					else 
 					{
@@ -83,6 +84,15 @@ public class LoginFrame extends JFrame {
 			}
 		});
 		
+		// Join Button Action
+		joinBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new JoinFrame();
+			}
+		});
+		
 		add(panel);
 		setVisible(true);
 		setSize(300, 200);
@@ -90,6 +100,13 @@ public class LoginFrame extends JFrame {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+	}
+	
+	public static void main(String[] args) {
+		new LoginFrame();
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (Exception e) {}
 	}
 
 }
