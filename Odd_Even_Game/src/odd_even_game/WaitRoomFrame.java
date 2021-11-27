@@ -16,19 +16,8 @@ public class WaitRoomFrame extends JFrame{
 	JTextPane pane;
 	JTextField tf;
 	JComboBox box;
-	JButton b1, b2, b3, b4, b5, b6;
+	JButton b3, b4, b5, b6;
 	JScrollBar bar;
-	
-	
-	
-	public static void main(String[] args) {
-		new WaitRoomFrame();
-		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch (Exception e) {}
-	}
-	
-	
 	
 	
 	
@@ -60,22 +49,10 @@ public class WaitRoomFrame extends JFrame{
 		JTextField tfChat = new JTextField();
 		JButton sendBtn = new JButton("send");
 		
-		tf = new JTextField(15);
-		box = new JComboBox();
-		box.addItem("black");
-		box.addItem("pink");
-		box.addItem("yellow");
-		box.addItem("cyan");
-		box.addItem("megenta");
-		box.addItem("green");
-		box.addItem("blue"); // 콤보 박스 색상
-		
 		JPanel p1 = new JPanel();
 		p1.add(tf); p1.add(box); // 검색 패널
 		
 		JPanel p2 = new JPanel();
-		b1 = new JButton("Create Room");
-		b2 = new JButton("Enter Room");
 		b3 = new JButton("1:1 신청");
 		b4 = new JButton("Send Message");
 		b5 = new JButton("View information");
@@ -106,8 +83,7 @@ public class WaitRoomFrame extends JFrame{
 		});
 
 		
-		p2.setLayout(new GridLayout(3, 2, 3, 3));
-		p2.add(b1); p2.add(b2);
+		p2.setLayout(new GridLayout(2, 2, 3, 3));
 		p2.add(b3); p2.add(b4);
 		p2.add(b5); p2.add(b6);
 		
@@ -134,5 +110,12 @@ public class WaitRoomFrame extends JFrame{
 		setVisible(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+	
+	public static void main(String[] args) {
+		new WaitRoomFrame();
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (Exception e) {}
 	}
 }

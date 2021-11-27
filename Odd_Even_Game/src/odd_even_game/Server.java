@@ -3,6 +3,8 @@ package odd_even_game;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Server {
 	Database db = new Database();
@@ -118,10 +120,15 @@ public class Server {
             			String id = in.readUTF();
                     	String password = in.readUTF();
                     	name = in.readUTF();
-                    	String Nickname = in.readUTF();
+                    	String nickName = in.readUTF();
                     	String email = in.readUTF();
                     	String sns = in.readUTF();
-
+                    	
+                    	LocalDate today = LocalDate.now(); // 현재 날짜
+                		String todayString = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")); // 현재 날짜 검색 조건에 맞게 포맷
+                    	
+                    	if(db.addUser(id, password, name, nickName, email, sns, socket.getInetAddress(), todayString))
+                    		System.out.println(id + " : join complete!");
                     	// 회원가입 하는 코드
             		}
                 	

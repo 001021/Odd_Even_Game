@@ -102,9 +102,10 @@ public class JoinFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String id = tfID.getText();
 	            String password = tfPassword.getText();
-				
-				
-				
+            	String name = tfPassword.getText();
+            	String nickName = tfPassword.getText();
+            	String email = tfPassword.getText();
+            	String sns = tfPassword.getText(); // ¹Ù²ã¾ß µÊ!
 				
 				
 	            try {
