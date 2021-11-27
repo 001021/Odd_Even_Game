@@ -11,7 +11,7 @@ public class Server {
    static HashMap<String, Object> loginList;
    static HashMap<String, Object> waitingList;   // 대기실에 waiting List
    static ArrayList<GameUser> userSocket;      // user outputStream 모아놓은 hashMap
-
+   
    
    Server() {
       loginList = new HashMap<String, Object>();
@@ -102,25 +102,39 @@ public class Server {
             
             while(in != null) {
             	if (loginList.get(name) != null) {
-                	String id = in.readUTF();
-                	String password = in.readUTF();
+            		
+            		if(in.readUTF().equals("login")) {
+            			String id = in.readUTF();
+                    	String password = in.readUTF();
+                    	
+                    	if(db.loginCheck(id, password)) {
+                    		out.writeUTF("Success");
+                    		loginList.remove(name);
+                    	}
+                    	else
+                    		out.writeUTF("Fail");
+            		}
+            		else {
+            			String id = in.readUTF();
+                    	String password = in.readUTF();
+                    	
+                    	
+                    	
+                    	// 회원가입 하는 코드
+            		}
                 	
-                	if(db.loginCheck(id, password)) {
-                		out.writeUTF("Success");
-                	}
-                	else
-                		out.writeUTF("Fail");
                 }
             	
             	else if (waitingList.get(name) != null)
-                  sendToAll(in.readUTF());
-            	else
-                  for(int i=0; i < RoomManager.roomList.size(); i++) {
-                     if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
-                        sendToGameRoom(in.readUTF(), RoomManager.roomList.get(i));
-                        break;
-                     }
-                  }
+            		sendToAll(in.readUTF());
+            	else {
+            		for(int i=0; i < RoomManager.roomList.size(); i++) {
+            			if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
+            				sendToGameRoom(in.readUTF(), RoomManager.roomList.get(i));
+            				break;
+            			}
+            		}
+            	}
             } // while(in != null)
             
          } catch(IOException e) {

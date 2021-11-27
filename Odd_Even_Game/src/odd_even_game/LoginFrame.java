@@ -76,12 +76,13 @@ public class LoginFrame extends JFrame {
             String password = txtPass.getText();
             
             try {
+            	out.writeUTF("login");
             	if(id != null)
             		out.writeUTF(id);
             	if(password != null)
             		out.writeUTF(password);
             		
-                if(in.readUTF().equals("Success")) {
+                if(in.readUTF().equals("Success")) {                	
                 	JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
                 	// User가 로그인 했을 때 뜨는 창으로 연결
                 	new WaitRoomFrame();
@@ -195,5 +196,10 @@ public class LoginFrame extends JFrame {
             } catch(IOException e) {}
          }
       }
+      
+      
+      
+      
+      
    }
 }

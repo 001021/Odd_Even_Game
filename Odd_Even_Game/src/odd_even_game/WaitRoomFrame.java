@@ -19,6 +19,19 @@ public class WaitRoomFrame extends JFrame{
 	JButton b1, b2, b3, b4, b5, b6;
 	JScrollBar bar;
 	
+	
+	
+	public static void main(String[] args) {
+		new WaitRoomFrame();
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (Exception e) {}
+	}
+	
+	
+	
+	
+	
 	public WaitRoomFrame() {
 		setTitle("Waiting Room");
 		// 방 정보 출력

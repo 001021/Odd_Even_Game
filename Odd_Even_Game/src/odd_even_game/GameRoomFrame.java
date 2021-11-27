@@ -71,7 +71,7 @@ public class GameRoomFrame {
 		JLabel lblNewLabel = new JLabel("\uD68C\uC6D0 \uC815\uBCF4 \uBCF4\uAE30");
 		panel_1.add(lblNewLabel);
 		
-		String oppMessage = "Ȧ";
+		final String oppMessage = "Ȧ";
 		
 		// Ȧ
 		JButton btnNewButton = new JButton("\uD640");

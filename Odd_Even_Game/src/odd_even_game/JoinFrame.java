@@ -3,6 +3,9 @@ package odd_even_game;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,6 +24,9 @@ public class JoinFrame extends JFrame {
 	private JTextField tfNickname;
 	private JTextField tfEmail;
 	private JTextField tfPhone;
+	
+	DataOutputStream out;
+    DataInputStream in;
 	
 	public JoinFrame() {
 		setTitle("Join");
@@ -94,6 +100,26 @@ public class JoinFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String id = tfID.getText();
+	            String password = tfPassword.getText();
+				
+				
+				
+				
+				
+	            try {
+					out.writeUTF("join");
+					if(id != null)
+	            		out.writeUTF(id);
+	            	if(password != null)
+	            		out.writeUTF(password);
+				} catch (IOException e1) {}
+				
+				
+				
+				
+				
+				
 				JOptionPane.showMessageDialog(null, "Welcome!");
 				dispose();
 			}

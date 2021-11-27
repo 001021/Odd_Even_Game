@@ -21,8 +21,6 @@ public class GameRoom {
 			user1.out.writeUTF("Welcome");
 			user2.out.writeUTF("Welcome");
 		} catch (IOException e) {}
-		
-		
 	}
 	
 	public void ExitGame(GameUser user) {
