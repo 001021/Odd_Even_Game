@@ -11,7 +11,8 @@ import java.io.IOException;
 
 //로그인 GUI
 public class LoginFrame extends JFrame {
-
+	Database db = new Database();
+	
 	public LoginFrame() {
 		
 		super("Login");
@@ -21,8 +22,8 @@ public class LoginFrame extends JFrame {
 		JLabel explain1 = new JLabel("<html><body style='text-align:center;'><br/><br/> 선생님, 저랑 게임 하나 하시겠습니까?<br/><br/>---------------------------<br/><br/></body>");
 		JLabel id = new JLabel("ID : ");
 		JLabel pswrd = new JLabel("PassWord : ");
-		JTextField txtID = new JTextField(10);
-		TextField txtPass = new TextField(10);
+		final JTextField txtID = new JTextField(10);
+		final TextField txtPass = new TextField(10);
 		add(txtPass);
 		txtPass.setEchoChar('*');//암호화
 		JButton logBtn = new JButton("Log in");
@@ -60,27 +61,28 @@ public class LoginFrame extends JFrame {
 		logBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e2) {
-				try{
-					String s;
-					String[] array;
-					BufferedReader bos = new BufferedReader(new FileReader("members.txt"));
-					while((s=bos.readLine())!=null){
-						array=s.split("/");
-					if(txtID.getText().equals(array[0])&&txtPass.getText().equals(array[1]))
-					{
-						JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
-						// User가 로그인 했을 때 뜨는 창으로 연결
-						new WaitRoomFrame();
-					}
-					else 
-					{
-						JOptionPane.showMessageDialog(null, "로그인 실패");
-					}
-					}
-					bos.close();
-				}catch (IOException E10){
-					System.out.println("파일 읽어오기 실패");
-				}
+				Database.loginCheck(txtID.getText(), txtPass.getText());
+//				try{
+//					String s;
+//					String[] array;
+//					BufferedReader bos = new BufferedReader(new FileReader("members.txt"));
+//					while((s=bos.readLine())!=null){
+//						array=s.split("/");
+//					if(txtID.getText().equals(array[0])&&txtPass.getText().equals(array[1]))
+//					{
+//						JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
+//						// User가 로그인 했을 때 뜨는 창으로 연결
+//						new WaitRoomFrame();
+//					}
+//					else 
+//					{
+//						JOptionPane.showMessageDialog(null, "로그인 실패");
+//					}
+//					}
+//					bos.close();
+//				}catch (IOException E10){
+//					System.out.println("파일 읽어오기 실패");
+//				}
 			}
 		});
 		
