@@ -107,7 +107,7 @@ public class Server {
             			String id = in.readUTF();
                     	String password = in.readUTF();
                     	
-                    	if(db.loginCheck(id, password)) {
+                    	if(db.IsValid(id, password)) {
                     		out.writeUTF("Success");
                     		loginList.remove(name);
                     	}
@@ -117,9 +117,11 @@ public class Server {
             		else {
             			String id = in.readUTF();
                     	String password = in.readUTF();
-                    	
-                    	
-                    	
+                    	name = in.readUTF();
+                    	String Nickname = in.readUTF();
+                    	String email = in.readUTF();
+                    	String sns = in.readUTF();
+
                     	// 회원가입 하는 코드
             		}
                 	

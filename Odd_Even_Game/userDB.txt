@@ -1,3 +1,4 @@
-game/game123/이이름/nick/1234@naver.com/aasdf/0/0/202111280247/127.0.0.1/3
-second/secondpassword/정이름/jname/second2@gmail.com/scdj/0/0/202111280247/127.0.0.1/3
-third/thirdpsw/세번째/thirds/thirdman@naver.com/qqqwer/0/0/202111280247/127.0.0.1/3
+game/game123/이이름/nick/1234@naver.com/aasdf/127.0.0.1/202111280247/1/0/3
+second/secondpassword/정이름/jname/second2@gmail.com/scdj/127.0.0.1/202111280247/1/0/0
+third/thirdpsw/세번째/thirds/thirdman@naver.com/qqqwer/127.0.0.1/202111280247/1/0/0
+newmem/asdfasdf/새친구/newone/new@gamil.com/127.0.0.1/202111280247/1/0/0
