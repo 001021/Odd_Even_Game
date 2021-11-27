@@ -15,8 +15,10 @@ import java.net.*;
 //로그인 GUI
 public class LoginFrame extends JFrame {
 	Database db = new Database();
+    DataOutputStream out;
+    DataInputStream in;
 
-   public LoginFrame(final DataOutputStream out) {
+   public LoginFrame(Socket socket) {
       
       super("Login");
       setLayout(null);
@@ -60,6 +62,11 @@ public class LoginFrame extends JFrame {
       add(logBtn);
       add(joinBtn);
       
+      try {
+          out = new DataOutputStream(socket.getOutputStream());
+          in = new DataInputStream(socket.getInputStream());
+      } catch(Exception e) {}
+      
 
       // Login Button action
       logBtn.addActionListener(new ActionListener() {
@@ -73,10 +80,8 @@ public class LoginFrame extends JFrame {
             		out.writeUTF(id);
             	if(password != null)
             		out.writeUTF(password);
-            	
-            	while(ClientReceiver.in == null)
             		
-                if(ClientReceiver.in.readUTF().equals("Success")) {
+                if(in.readUTF().equals("Success")) {
                 	JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
                 	// User가 로그인 했을 때 뜨는 창으로 연결
                 	new WaitRoomFrame();
@@ -112,11 +117,12 @@ public class LoginFrame extends JFrame {
 	   Random randomGen = new Random();
 	   long registrationNumber = randomGen.nextLong();
 	   DataOutputStream out = null;
+	   Socket clientSocket = null;
 	      
 	   try {
 		   String serverIp = "127.0.0.1";
 		   int nPort = 21118;
-		   Socket clientSocket = new Socket(serverIp, nPort);
+		   clientSocket = new Socket(serverIp, nPort);
 		   System.out.println("Connected to Server");
 		   
 		   out = new DataOutputStream(clientSocket.getOutputStream());
@@ -133,9 +139,9 @@ public class LoginFrame extends JFrame {
 		   
 	   } catch(ConnectException ce) {
 		   ce.printStackTrace();
-		   } catch(Exception e) {}
+	   } catch(Exception e) {}
 	   
-	   new LoginFrame(out);
+	   new LoginFrame(clientSocket);
 	   try {
 		   UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 	   } catch (Exception e) {}

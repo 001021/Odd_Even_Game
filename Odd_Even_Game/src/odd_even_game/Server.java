@@ -15,7 +15,7 @@ public class Server {
    
    Server() {
       loginList = new HashMap<String, Object>();
-      // waitingList = new HashMap<String, Object>();
+      waitingList = new HashMap<String, Object>();
       Collections.synchronizedMap(waitingList);
       
       userSocket = new ArrayList<GameUser>();
@@ -86,10 +86,11 @@ public class Server {
          
          try {
             name = in.readUTF();
-            sendToAll("#" + name + " came in");
+            System.out.println(name);
+//            sendToAll("#" + name + " came in");
             
             loginList.put(name, out);
-            System.out.println("The current number of server users : " + waitingList.size());
+            System.out.println("The current number of server users : " + loginList.size());
             
             
 //            userSocket.add(new GameUser(name, socket));   // GameUser arrayList¿¡ Ãß°¡
