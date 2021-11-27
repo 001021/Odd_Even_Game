@@ -16,7 +16,7 @@ import java.net.*;
 public class LoginFrame extends JFrame {
 	Database db = new Database();
 
-   public LoginFrame() {
+   public LoginFrame(final DataOutputStream out) {
       
       super("Login");
       setLayout(null);
@@ -60,19 +60,6 @@ public class LoginFrame extends JFrame {
       add(logBtn);
       add(joinBtn);
       
-      
-      Random randomGen = new Random();
-      long registrationNumber = randomGen.nextLong();
-      
-      try {
-         String serverIp = "127.0.0.1";
-         int nPort = 21118;
-         Socket clientSocket = new Socket(serverIp, nPort);
-         System.out.println("Connected to Server");
-         
-      } catch(ConnectException ce) {
-         ce.printStackTrace();
-      } catch(Exception e) {}
 
       // Login Button action
       logBtn.addActionListener(new ActionListener() {
@@ -83,9 +70,9 @@ public class LoginFrame extends JFrame {
             
             try {
             	if(id != null)
-            		ClientSender.out.writeUTF(id);
+            		out.writeUTF(id);
             	if(password != null)
-            		ClientSender.out.writeUTF(password);
+            		out.writeUTF(password);
             	
             	while(ClientReceiver.in == null)
             		
@@ -122,15 +109,41 @@ public class LoginFrame extends JFrame {
    }
    
    public static void main(String[] args) {
-      new LoginFrame();
-      try {
-         UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-      } catch (Exception e) {}
+	   Random randomGen = new Random();
+	   long registrationNumber = randomGen.nextLong();
+	   DataOutputStream out = null;
+	      
+	   try {
+		   String serverIp = "127.0.0.1";
+		   int nPort = 21118;
+		   Socket clientSocket = new Socket(serverIp, nPort);
+		   System.out.println("Connected to Server");
+		   
+		   out = new DataOutputStream(clientSocket.getOutputStream());
+		   out.writeUTF(String.valueOf(registrationNumber));
+		   
+		   
+		   
+		   
+//		   Thread sender = new Thread(new ClientSender(clientSocket, registrationNumber));
+//		   Thread receiver = new Thread(new ClientReceiver(clientSocket));
+//			
+//		   sender.start();
+//		   receiver.start();
+		   
+	   } catch(ConnectException ce) {
+		   ce.printStackTrace();
+		   } catch(Exception e) {}
+	   
+	   new LoginFrame(out);
+	   try {
+		   UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+	   } catch (Exception e) {}
    }
    
    static class ClientSender extends Thread{
       Socket socket;
-      static DataOutputStream out;
+      DataOutputStream out;
       String registrationNumber;
       
       ClientSender(Socket socket, long registrationNumber){

@@ -92,34 +92,28 @@ public class Server {
             System.out.println("The current number of server users : " + waitingList.size());
             
             
-            
-            
-            
 //            userSocket.add(new GameUser(name, socket));   // GameUser arrayList¿¡ Ãß°¡
 //            if (userSocket.size() % 2 == 0) {
 //               roomManger.CreateRoom(userSocket.get(0), userSocket.get(1));
 //            }
             
-            if (loginList.get(name) != null) {
-            	while(in != null) {
-            		String id = in.readUTF();
-            		String password = in.readUTF();
-            		
-            		if(db.loginCheck(id, password)) {
-            			out.writeUTF("Success");
-            		}
-            		else
-            			out.writeUTF("Fail");
-            	}
-        	}
             
             
             while(in != null) {
+            	if (loginList.get(name) != null) {
+                	String id = in.readUTF();
+                	String password = in.readUTF();
+                	
+                	if(db.loginCheck(id, password)) {
+                		out.writeUTF("Success");
+                	}
+                	else
+                		out.writeUTF("Fail");
+                }
             	
-            	
-               if (waitingList.get(name) != null)
+            	else if (waitingList.get(name) != null)
                   sendToAll(in.readUTF());
-               else
+            	else
                   for(int i=0; i < RoomManager.roomList.size(); i++) {
                      if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
                         sendToGameRoom(in.readUTF(), RoomManager.roomList.get(i));
