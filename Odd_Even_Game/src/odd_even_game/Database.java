@@ -3,8 +3,6 @@ package odd_even_game;
 import java.sql.*;
 
 public class Database {
-		
-	
 	public static void main(String[] args) {
 		new Database();
 	}
@@ -28,7 +26,7 @@ public class Database {
 		}
 		
 		//로그인 여부를 확인하는 메소드. 서버에 닉네임을 String 형식으로 반환한다.
-		String loginCheck(String _i, String _p) {
+		boolean loginCheck(String _i, String _p) {
 			String nickname = "null";	//반환할 닉네임 변수를 "null"로 초기화.
 			
 			//매개변수로 받은 id와 password값을 id와 pw값에 초기화한다.
@@ -55,11 +53,11 @@ public class Database {
 					count++;
 				}
 			} catch(Exception e) {	//조회에 실패했을 때 nickname을 "null"로 초기화. 실패를 콘솔로 알린다.
-				nickname = "null";
 				System.out.println("[Server] 로그인 실패 > " + e.toString());
+				return false;
 			}
 			
-			return nickname;	//nickname 반환
+			return true;
 		}
 		
 		//회원가입을 수행하는 메소드. 회원가입에 성공하면 true, 실패하면 false를 반환한다.
