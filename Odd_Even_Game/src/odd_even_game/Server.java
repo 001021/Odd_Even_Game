@@ -3,7 +3,7 @@ package odd_even_game;
 import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Server {
@@ -11,8 +11,8 @@ public class Server {
 	RoomManager roomManger;
    
    static HashMap<String, Object> loginList;
-   static HashMap<String, Object> waitingList;   // ´ë±â½Ç¿¡ waiting List
-   static ArrayList<GameUser> userSocket;      // user outputStream ¸ð¾Æ³õÀº hashMap
+   static HashMap<String, Object> waitingList;   // ï¿½ï¿½ï¿½Ç¿ï¿½ waiting List
+   static ArrayList<GameUser> userSocket;      // user outputStream ï¿½ï¿½Æ³ï¿½ï¿½ï¿½ hashMap
    
    
    Server() {
@@ -51,6 +51,7 @@ public class Server {
       while(it.hasNext()) {
          try {
             DataOutputStream out = (DataOutputStream)waitingList.get(it.next());
+            out.writeUTF("chating in");
             out.writeUTF(msg);
          } catch(IOException e) {}
       }
@@ -70,7 +71,7 @@ public class Server {
       new Server().start();
    }
    
-   class ServerReceiver extends Thread{   // Server Receiver À¯ÀúµéÀÇ Ã¤ÆÃ ¹Þ´Â °÷
+   class ServerReceiver extends Thread{   // Server Receiver ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½ ï¿½Þ´ï¿½ ï¿½ï¿½
       Socket socket;
       DataInputStream in;
       DataOutputStream out;
@@ -95,7 +96,7 @@ public class Server {
             System.out.println("The current number of server users : " + loginList.size());
             
             
-//            userSocket.add(new GameUser(name, socket));   // GameUser arrayList¿¡ Ãß°¡
+//            userSocket.add(new GameUser(name, socket));   // GameUser arrayListï¿½ï¿½ ï¿½ß°ï¿½
 //            if (userSocket.size() % 2 == 0) {
 //               roomManger.CreateRoom(userSocket.get(0), userSocket.get(1));
 //            }
@@ -111,6 +112,7 @@ public class Server {
                     	
                     	if(db.IsValid(id, password)) {
                     		out.writeUTF("Success");
+                    		out.writeUTF(db.getNickName(id));
                     		loginList.remove(name);
                     	}
                     	else
@@ -124,18 +126,45 @@ public class Server {
                     	String email = in.readUTF();
                     	String sns = in.readUTF();
                     	
-                    	LocalDate today = LocalDate.now(); // ÇöÀç ³¯Â¥
-                		String todayString = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")); // ÇöÀç ³¯Â¥ °Ë»ö Á¶°Ç¿¡ ¸Â°Ô Æ÷¸Ë
+                    	LocalDateTime today = LocalDateTime.now(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Â¥
+                		String todayString = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Â¥ ï¿½Ë»ï¿½ ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½Â°ï¿½ ï¿½ï¿½ï¿½ï¿½
                     	
-                    	if(db.addUser(id, password, name, nickName, email, sns, socket.getInetAddress(), todayString))
+                    	if(db.addUser(id, password, name, nickName, email, sns, socket.getInetAddress(), todayString)){
                     		System.out.println(id + " : join complete!");
-                    	// È¸¿ø°¡ÀÔ ÇÏ´Â ÄÚµå
+                    		out.writeUTF("Success");
+                    	}
+                    	else {
+                    		System.out.println(id + " : join failed!");
+                    		out.writeUTF("Fail");
+                    	}
             		}
-                	
                 }
             	
-            	else if (waitingList.get(name) != null)
-            		sendToAll(in.readUTF());
+            	else if (waitingList.get(name) != null) {
+            		if(in.readUTF().equals("memberInfo")) {
+            			String nickName = in.readUTF();
+            			String info = db.getUserInfo(nickName);
+            			String[] array =info.split("/");
+            			out.writeUTF(array[0]);
+            			out.writeUTF(array[1]);
+            		}
+            		else if (in.readUTF().equals("battleRequest")) {
+            			String nickName = in.readUTF();
+            			
+            			// ì½”ë“œ ?
+            		}
+            		else if (in.readUTF().equals("chat")) {
+            			sendToAll(in.readUTF());
+            		}
+            			
+            			
+            			
+            			
+            			
+            			
+            		}
+   
+            		
             	else {
             		for(int i=0; i < RoomManager.roomList.size(); i++) {
             			if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
@@ -150,10 +179,10 @@ public class Server {
             
          } finally {
             sendToAll("#" + name + " left");
-            waitingList.remove(name);
+            loginList.remove(name);
             System.out.println("[" + socket.getInetAddress() + " : " +
                   socket.getPort() + "] connection closed");
-            System.out.println("The current number of server users : " + waitingList.size());
+            System.out.println("The current number of server users : " + loginList.size());
          }
       }
    }

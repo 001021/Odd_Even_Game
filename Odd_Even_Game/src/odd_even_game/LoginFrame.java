@@ -12,29 +12,29 @@ import java.util.Scanner;
 
 import java.net.*;
 
-//·Î±×ÀÎ GUI
+//ï¿½Î±ï¿½ï¿½ï¿½ GUI
 public class LoginFrame extends JFrame {
-	Database db = new Database();
+	Socket socket=null;
     DataOutputStream out;
     DataInputStream in;
 
-   public LoginFrame(Socket socket) {
+   public LoginFrame(final Socket socket) {
       
       super("Login");
       setLayout(null);
 
       JPanel panel = new JPanel();
-      JLabel explain1 = new JLabel("<html><body style='text-align:center;'><br/><br/> ¼±»ı´Ô, Àú¶û °ÔÀÓ ÇÏ³ª ÇÏ½Ã°Ú½À´Ï±î?<br/><br/>---------------------------<br/><br/></body>");
+      JLabel explain1 = new JLabel("<html><body style='text-align:center;'><br/><br/> ì„ ìƒë‹˜, ì €ë‘ ê²Œì„ í•˜ë‚˜ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?<br/><br/>---------------------------<br/><br/></body>");
       JLabel id = new JLabel("ID : ");
       JLabel pswrd = new JLabel("PassWord : ");
       final JTextField txtID = new JTextField(10);
       final TextField txtPass = new TextField(10);
       add(txtPass);
-      txtPass.setEchoChar('*');//¾ÏÈ£È­
+      txtPass.setEchoChar('*');//ì•”í˜¸í™”
       JButton logBtn = new JButton("Log in");
       JButton joinBtn = new JButton("Join us!");
-      Font font_explain = new Font("DXÅ¸ÀÚB", Font.PLAIN, 15);
-      Font font = new Font("³Ø½¼ Ç²º¼°íµñ L", Font.PLAIN, 15);
+      Font font_explain = new Font("DXíƒ€ìB", Font.PLAIN, 15);
+      Font font = new Font("ë„¥ìŠ¨ í’‹ë³¼ê³ ë”• L", Font.PLAIN, 15);
       
       explain1.setFont(font_explain);
       explain1.setBounds(40, 15, 270, 50);
@@ -62,6 +62,7 @@ public class LoginFrame extends JFrame {
       add(logBtn);
       add(joinBtn);
       
+      this.socket = socket;
       try {
           out = new DataOutputStream(socket.getOutputStream());
           in = new DataInputStream(socket.getInputStream());
@@ -82,13 +83,14 @@ public class LoginFrame extends JFrame {
             	if(password != null)
             		out.writeUTF(password);
             		
-                if(in.readUTF().equals("Success")) {                	
-                	JOptionPane.showMessageDialog(null, "°ÔÀÓ ÇÑ ÆÇ ÇÒ±î¿ä!");
-                	// User°¡ ·Î±×ÀÎ ÇßÀ» ¶§ ¶ß´Â Ã¢À¸·Î ¿¬°á
-                	new WaitRoomFrame();
+                if(in.readUTF().equals("Success")) {
+                	String nickName = in.readUTF();
+                	JOptionPane.showMessageDialog(null, "ê²Œì„ í•œ íŒ í• ê¹Œìš”!");
+                	// Userê°€ ë¡œê·¸ì¸ í–ˆì„ ë•Œ ëœ¨ëŠ” ì°½ìœ¼ë¡œ ì—°ê²°
+                	new WaitRoomFrame(socket, nickName);
                 }
                 else {
-                	JOptionPane.showMessageDialog(null, "·Î±×ÀÎ ½ÇÆĞ");
+                	JOptionPane.showMessageDialog(null, "ë¡œê·¸ì¸ ì‹¤íŒ¨");
                 }
 			} catch (IOException e) {}
          }
@@ -101,7 +103,7 @@ public class LoginFrame extends JFrame {
          
          @Override
          public void actionPerformed(ActionEvent e) {
-            new JoinFrame();
+            new JoinFrame(socket);
          }
       });
       
@@ -165,7 +167,7 @@ public class LoginFrame extends JFrame {
          Scanner keyboard = new Scanner(System.in);
          try {
             if(out != null) {
-               out.writeUTF(registrationNumber); // Ã³À½ ´Ğ³×ÀÓ send
+               out.writeUTF(registrationNumber); // Ã³ï¿½ï¿½ ï¿½Ğ³ï¿½ï¿½ï¿½ send
             }
             
             while(out != null) {

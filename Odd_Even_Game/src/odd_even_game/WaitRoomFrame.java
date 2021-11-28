@@ -3,119 +3,217 @@ package odd_even_game;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.Socket;
 
 import javax.swing.*;
 import javax.swing.table.*;
 
 public class WaitRoomFrame extends JFrame{
-	JTable table1, table2; // ¹æ Á¤º¸°¡ µé¾î°¥ table1, Á¢¼ÓÀÚ Á¤º¸°¡ µé¾î°¥ table2
-	DefaultTableModel model1, model2;
-	JTextPane pane;
-	JTextField tf;
-	JComboBox box;
-	JButton b3, b4, b5, b6;
-	JScrollBar bar;
-	
-	
-	
-	public WaitRoomFrame() {
-		setTitle("Waiting Room");
-		// ¹æ Á¤º¸ Ãâ·Â
-		String col1[] = {"Room Name", "State", "Headcount"};
-		String row1[][] = new String[0][3];
-		model1 = new DefaultTableModel(row1, col1);
+   JTable table2; // ì ‘ì†ì ì •ë³´ê°€ ë“¤ì–´ê°ˆ table2
+   DefaultTableModel model2;
+   JPanel pane;
+   JPanel inputPane;
+   JTextArea display;
+   JTextField tf;
+   private JTextField tfChat;
+   JComboBox box;
+   JButton b3, b5, b6;
+   JScrollBar bar;
+   
+   String nick = null;
+   
+	Socket socket=null;
+    DataOutputStream out;
+    DataInputStream in;
 
-		table1 = new JTable(model1);
-		JScrollPane js1 = new JScrollPane(table1);
 
-		// Á¢¼ÓÀÚ Á¤º¸ Ãâ·Â
-		String col2[] = {"ID", "Nickname", "Record", "State"}; // ¾ÆÀÌµğ, ´ëÈ­¸í, °ÔÀÓ ÀüÀû, ÇöÀç »óÅÂ(°ÔÀÓÁß/´ë±âÁß)
-		String row2[][] = new String[0][4];
-		model2 = new DefaultTableModel(row2, col2);
-		
-		table1.getTableHeader().setReorderingAllowed(false); // Å×ÀÌºí °íÁ¤
-		
-		table2 = new JTable(model2);
-		JScrollPane js2 = new JScrollPane(table2);
-		table2.getTableHeader().setReorderingAllowed(false); // Å×ÀÌºí2 °íÁ¤
-		
-		pane = new JTextPane();
-		pane.setEditable(false);
-		JScrollPane js3 = new JScrollPane(pane);
-		bar = js3.getVerticalScrollBar();
-		JTextField tfChat = new JTextField();
-		JButton sendBtn = new JButton("send");
-		
-		JPanel p1 = new JPanel();
-		p1.add(tf); p1.add(box); // °Ë»ö ÆĞ³Î
-		
-		JPanel p2 = new JPanel();
-		b3 = new JButton("1:1 ½ÅÃ»");
-		b4 = new JButton("Send Message");
-		b5 = new JButton("View information");
-		b6 = new JButton("Exit");
-		
-		b3.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e1) {
-				// ´©±¸ÇÑÅ× ½ÅÃ»ÇÒ °ÍÀÎÁö?
+
+   public WaitRoomFrame(Socket socket, final String nickName) {
+      setTitle("Waiting Room");
+      
+      this.socket = socket;
+      try {
+          out = new DataOutputStream(socket.getOutputStream());
+          in = new DataInputStream(socket.getInputStream());
+      } catch(Exception e) {}
+
+      // ì ‘ì†ì ì •ë³´ ì¶œë ¥
+      String col2[] = {"ID", "Nickname", "Record"}; // ì•„ì´ë””, ëŒ€í™”ëª…, ê²Œì„ ì „ì 
+      String row2[][] = new String[0][3];
+      model2 = new DefaultTableModel(row2, col2);
+
+      table2 = new JTable(model2);
+      JScrollPane js2 = new JScrollPane(table2);
+      table2.setBackground(Color.WHITE);
+      table2.getTableHeader().setReorderingAllowed(false); // í…Œì´ë¸”2 ê³ ì •
+
+      pane = new JPanel();
+      display = new JTextArea(11, 30);
+      display.setEditable(false);
+      JScrollPane js3 = new JScrollPane(display, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+      pane.add(js3);
+
+      inputPane = new JPanel();
+
+
+      tfChat = new JTextField(25);
+      JButton sendBtn = new JButton("send");
+      
+      sendBtn.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+        	 try {
+				out.writeUTF("chat");
+				out.writeUTF("[" + nickName + "] " + tfChat.getText());
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	 
+            display.append(  "[" + nick + "ë‹˜]: " + tfChat.getText() + "\n");
+            tfChat.selectAll();
+         }
+      });
+      
+      
+      inputPane.add(tfChat);
+      
+      Action ok = new AbstractAction() {
+         @Override
+         public void actionPerformed(ActionEvent arg0) {
+
+            display.append( "[" + nick + "ë‹˜]: " + tfChat.getText() + "\n");
+            tfChat.selectAll();
+
+         }
+      };
+
+      KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
+      tfChat.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "ENTER");
+      tfChat.getActionMap().put("ENTER", ok);
+      JPanel p2 = new JPanel();
+      b3 = new JButton("1:1 ì‹ ì²­");
+      b5 = new JButton("View info");
+      b6 = new JButton("Exit");
+
+      b3.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e1) {
+        	  
+        	  try {
+				out.writeUTF("battleRequest");
+				
 				JOptionPane aa = new JOptionPane();
-				String oppID = aa.showInputDialog("´ë°áÀ» ½ÅÃ»ÇÒ »ó´ëÀÇ ID¸¦ ÀÔ·ÂÇÏ¼¼¿ä.");
-				// »ó´ë¹æ ¾ÆÀÌµğ°¡ Á¢¼ÓÁß ¾ÆÀÌµğ¿¡ ÀÖÀ¸¸é ´ë°á ¸Ş½ÃÁö Àü¼Û
-				if (oppID == "001021") {
-					// ¸Ş½ÃÁö Àü¼Û
-				}
-				else { // ¾øÀ¸¸é Àß¸øµÆ´Ù°í ¶ç¿ì±â
-					 JOptionPane.showMessageDialog(null, "Á¢¼Ó ÁßÀÎ ID°¡ ¾Æ´Õ´Ï´Ù!");
-				}
-			}
-		});
-		
-		// Exit Button action
-		b6.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e2) {
-				System.exit(0);
-			}
-		});
+				String oppID = aa.showInputDialog("ëŒ€ê²°ì„ ì‹ ì²­í•  ìƒëŒ€ì˜ NickNameì„ ì…ë ¥í•˜ì„¸ìš”.");
+				out.writeUTF(oppID);
+				
+				
+        	  } catch (IOException e) {}
+             
+             JOptionPane aa = new JOptionPane();
+             String myID = null;
+             // ëˆ„êµ¬í•œí…Œ ì‹ ì²­í•  ê²ƒì¸ì§€?
+             String oppID = aa.showInputDialog("ëŒ€ê²°ì„ ì‹ ì²­í•  ìƒëŒ€ì˜ NickNameì„ ì…ë ¥í•˜ì„¸ìš”.");
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             
+             // ìƒëŒ€ë°© ì•„ì´ë””ê°€ ì ‘ì†ì¤‘ ì•„ì´ë””ì— ìˆìœ¼ë©´ ëŒ€ê²° ë©”ì‹œì§€ ì „ì†¡
+             if (oppID.equals("001021")) {
+                // oppIDì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
+                // ë‚˜ì—ê²Œ ì˜¤ëŠ” ë©”ì„¸ì§€
+                JOptionPane.showMessageDialog(null, "ëŒ€ê²° ìˆ˜ë½ì„ ê¸°ë‹¤ë¦¬ëŠ” ì¤‘...", " ëŒ€ ê²° ëŒ€ ê¸°", JOptionPane.PLAIN_MESSAGE);
+                // ìƒëŒ€ë°©ì—ê²Œ ê°€ëŠ” ë©”ì‹œì§€
+                // confirm dialogì˜ ë¦¬í„´ê°’ : YES == 0 NO == 1 X == -1 (íŒì—… ì¢…ë£Œ)
+                int YorN = JOptionPane.showConfirmDialog(null, myID + "ë‹˜ìœ¼ë¡œë¶€í„° ëŒ€ê²° ì‹ ì²­!\nìˆ˜ë½í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", " ëŒ€ ê²° ì‹  ì²­", JOptionPane.YES_NO_OPTION);
+                
+                if (YorN == 0) {
+                   JOptionPane.showMessageDialog(null, "ëŒ€ê²° ì„±ì‚¬! ê²Œì„ë°©ìœ¼ë¡œ ì´ë™í•©ë‹ˆë‹¤!", " ëŒ€ ê²° ì„± ì‚¬", JOptionPane.PLAIN_MESSAGE);
+                }
+                
+                else {
+                   // ë‚˜ì—ê²Œ ì˜¤ëŠ” ë©”ì„¸ì§€
+                   JOptionPane.showMessageDialog(null, nick + "ë‹˜ê»˜ì„œ ëŒ€ê²°ì„ ê±°ì ˆí•˜ì…¨ìŠµë‹ˆë‹¤...", " ëŒ€ ê²° ê±° ì ˆ", JOptionPane.PLAIN_MESSAGE);
+                   // ìƒëŒ€ë°©ì—ê²Œ ê°€ëŠ” ë©”ì„¸ì§€
+                   JOptionPane.showMessageDialog(null, myID + "ë‹˜ê³¼ì˜ ëŒ€ê²°ì„ ê±°ì ˆí•˜ì…¨ìŠµë‹ˆë‹¤...", " ëŒ€ ê²° ê±° ì ˆ", JOptionPane.PLAIN_MESSAGE);
+                }
+             }
+             else { // ì—†ìœ¼ë©´ ì˜ëª»ëë‹¤ê³  ë„ìš°ê¸°
+                JOptionPane.showMessageDialog(null, "ì ‘ì† ì¤‘ì¸ IDê°€ ì•„ë‹™ë‹ˆë‹¤!", " ì—ëŸ¬!", JOptionPane.PLAIN_MESSAGE);
+             }
+          }
+       });
+      
+      
+      
+      b5.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e2) {
+        	  try {
+              	out.writeUTF("memberInfo");
+              	
+              	 // ëˆ„êµ¬í•œí…Œ ì‹ ì²­í•  ê²ƒì¸ì§€?
+                String oppID = JOptionPane.showInputDialog("ì •ë³´ë¥¼ ë³´ê³ ì‹¶ì€ ìƒëŒ€ì˜ NickNameì„ ì…ë ¥í•˜ì„¸ìš”.");
+              	
+              	if(oppID != null)
+              		out.writeUTF(oppID);
+              	int win = Integer.parseInt(in.readUTF());
+    			int lose = Integer.parseInt(in.readUTF());
+    			
+    			new MemberInfoFrame(oppID, win, lose);
+    			
+  			} catch (IOException e) {}
+          }
+       });
+      
+      
+      
+      
 
-		
-		p2.setLayout(new GridLayout(2, 2, 3, 3));
-		p2.add(b3); p2.add(b4);
-		p2.add(b5); p2.add(b6);
-		
-		// ¹èÄ¡
-		setLayout(null);
-		js1.setBounds(10, 15, 400, 250);
-		js2.setBounds(10, 300, 400, 250);
-		js3.setBounds(420, 15, 250, 220);
-		tfChat.setBounds(420, 235, 170, 30);
-		sendBtn.setBounds(590, 235, 80, 30);
-		
-		
-		p1.setBounds(420, 300, 250, 50);
-		p2.setBounds(420, 390, 250, 150);
-		add(js1);
-		add(js2);
-		add(js3);
-		add(tfChat);
-		add(sendBtn);
-		add(p1);
-		add(p2);
-		
-		setSize(700, 600); // Ã¢ »çÀÌÁî
-		setVisible(true);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-	}
-	
-	public static void main(String[] args) {
-		new WaitRoomFrame();
-		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch (Exception e) {}
-	}
+      // Exit Button action
+      b6.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e2) {
+            System.exit(0);
+         }
+      });
+
+
+      p2.setLayout(new GridLayout(1, 3, 3, 3));
+      p2.add(b3);
+      p2.add(b5); p2.add(b6);
+
+      // ë°°ì¹˜
+      setLayout(null);
+      js2.setBounds(10, 15, 300, 550);
+      js3.setBounds(330, 15, 350, 400);
+      inputPane.setBounds(330, 415, 270, 30);
+      sendBtn.setBounds(600, 420, 80, 20);
+
+
+      p2.setBounds(330, 450, 350, 100);
+      add(js2);
+      add(js3);
+      add(inputPane);
+      add(sendBtn);
+      add(p2);
+
+      setSize(700, 600); // ì°½ ì‚¬ì´ì¦ˆ
+      setVisible(true);
+      setLocationRelativeTo(null);
+      setDefaultCloseOperation(EXIT_ON_CLOSE);
+   }
+
 }
