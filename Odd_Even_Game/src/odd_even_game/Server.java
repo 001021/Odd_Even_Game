@@ -57,6 +57,28 @@ public class Server {
       }
    }
    
+   boolean sendRequestGame(String myNickName, String oppNickName) {
+	      Iterator<String> it = waitingList.keySet().iterator();
+	      
+	      while(it.hasNext()) {
+	         try {
+	        	 if (it.equals(oppNickName)) {
+	        		 DataOutputStream out = (DataOutputStream)waitingList.get(it.next());
+	        		 DataInputStream in = (DataInputStream)waitingList.get(it.next());
+	        		
+	        		 out.writeUTF("battleRequest from others");
+	        		 out.writeUTF(myNickName);
+	        		 if(in.readUTF().equals("yes")) {
+	        			 return true;
+	        		 }
+	        		 else
+	        			 return false;
+	        	 }
+	         } catch(IOException e) {}
+	      }
+	      return false;
+	   }
+   
    void sendToGameRoom(String msg, GameRoom room) {
       try {
          DataOutputStream out = (DataOutputStream)room.userList.get(0).out;
@@ -114,6 +136,7 @@ public class Server {
                     		out.writeUTF("Success");
                     		out.writeUTF(db.getNickName(id));
                     		loginList.remove(name);
+                    		waitingList.put(name, out);
                     	}
                     	else
                     		out.writeUTF("Fail");
@@ -141,29 +164,30 @@ public class Server {
                 }
             	
             	else if (waitingList.get(name) != null) {
-            		if(in.readUTF().equals("memberInfo")) {
+            		String query = in.readUTF();
+            		if(query.equals("memberInfo")) {
             			String nickName = in.readUTF();
             			String info = db.getUserInfo(nickName);
             			String[] array =info.split("/");
             			out.writeUTF(array[0]);
             			out.writeUTF(array[1]);
             		}
-            		else if (in.readUTF().equals("battleRequest")) {
-            			String nickName = in.readUTF();
+            		else if (query.equals("battleRequest")) {
+            			String myNickName = in.readUTF();
+            			String oppNickName = in.readUTF();
+            			if(sendRequestGame(myNickName, oppNickName)) {
+            				out.writeUTF("yes");
+            			}
+            			else
+            				out.writeUTF("no");
+            			
             			
             			// 코드 ?
             		}
-            		else if (in.readUTF().equals("chat")) {
+            		else if (query.equals("chat")) {
             			sendToAll(in.readUTF());
             		}
-            			
-            			
-            			
-            			
-            			
-            			
-            		}
-   
+            	}
             		
             	else {
             		for(int i=0; i < RoomManager.roomList.size(); i++) {
@@ -173,7 +197,7 @@ public class Server {
             			}
             		}
             	}
-            } // while(in != null)
+            }// while(in != null)
             
          } catch(IOException e) {
             
