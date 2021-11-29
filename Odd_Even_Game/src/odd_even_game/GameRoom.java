@@ -8,12 +8,12 @@ public class GameRoom {
 	List<GameUser> userList;
 	String roomName;
 	
-	public GameRoom() {
+	public GameRoom() {	
 		userList = new ArrayList<GameUser>();
 	}
 	
 	public GameRoom(GameUser user1, GameUser user2) {
-		userList = new ArrayList<GameUser>();
+		userList = new ArrayList<GameUser>();	//input user to <GameUser>
 		userList.add(user1);
 		userList.add(user2);
 		
@@ -23,7 +23,7 @@ public class GameRoom {
 		} catch (IOException e) {}
 	}
 	
-	public void ExitGame(GameUser user) {
+	public void ExitGame(GameUser user) {	//Exit game
 		WaitingRoomServer.RoomManager.RemoveRoom(this);
 	}
 }

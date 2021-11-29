@@ -5,16 +5,16 @@ import java.net.InetAddress;
 
 public class Database {
 
-   //ID, 닉네임 중복검사
+   //ID, nickname, duplicate check
    boolean checkDuplicate(String id, String nickName) {
       try {
-         String[] array;
+         String[] array;	// array[]-0: id, 1: pw, 2: name, 3: nickname, 4: email, 5: sns, 6:  date, 7: ip, 8: number of visits, 9: win, 10: lose
          String fileName = "userDB.txt";
          FileReader fr = new FileReader(fileName);
          String line="";
          BufferedReader br = new BufferedReader(fr);
          
-         while((line=br.readLine())!=null){
+         while((line=br.readLine())!=null){ 	//Read the file until there's an empty space
             array=line.split("/");
             if(id.equals(array[0]) || nickName.equals(array[3])) {
                return true;
@@ -29,23 +29,23 @@ public class Database {
     }
     
     
-    // 회원가입 정보 추가
+    // Add membership information
     boolean addUser(String id, String password, String name, String nickName, String email, String sns, InetAddress inetAddress, String time) {
     	EnPassword secu = new EnPassword();
     	password = secu.encryptSHA256(password);
        
        if(id==null||password==null||name==null||nickName==null||email==null||sns==null||inetAddress==null)
-          return false;
+          return false;	//Failure if even one place has a null value
        
        if(checkDuplicate(id, nickName)) {
           System.out.println("Duplicate id, nickName");
-          return false;
+          return false;	
        }
        
        try {
           BufferedWriter bw = new BufferedWriter(new FileWriter("userDB.txt",true));
           bw.write(id+"/"+password+"/"+name+"/"+nickName+"/"+email+"/"+sns+"/"+inetAddress+"/"+time+"/1/0/0"+"\n");
-          bw.close();
+          bw.close();	//file update
        }catch(IOException e) {
           System.out.println(e);
           return false;
@@ -54,10 +54,10 @@ public class Database {
     }
     
     
-    //로그인
+    //login
     boolean IsValid(String id, String password){
     	EnPassword secu = new EnPassword();
-    	password = secu.encryptSHA256(password);
+    	password = secu.encryptSHA256(password);	//Password encryption
        
        try {
           String[] array;
@@ -87,7 +87,7 @@ public class Database {
        return false;
     }
     
-    //승패 조회
+    //Win-loss check
     String getUserInfo(String nickName){
        try {
           String[] array;
@@ -174,7 +174,7 @@ public class Database {
            }
     }
     
-    //마지막 접속시간, 방문횟수 업데이트
+    //Last access time, number of visits updated
     void updateConnection(String nickName, String time){
        try {
              String[] array;
@@ -205,7 +205,7 @@ public class Database {
                }
        }
     
-    //닉네임검색
+    //Search Nickname
     String getNickName(String id){
        try {
           String[] array;
