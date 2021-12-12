@@ -12,7 +12,7 @@ public class Server {
    
    static HashMap<String, Object> loginList;
    static HashMap<String, Object> waitingList;   // ���ǿ� waiting List
-   static ArrayList<GameUser> userSocket;      // user outputStream ��Ƴ��� hashMap
+   static ArrayList<GameUser> GamersList;      // user outputStream ��Ƴ��� hashMap
    
    
    Server() {
@@ -20,7 +20,7 @@ public class Server {
       waitingList = new HashMap<String, Object>();
       Collections.synchronizedMap(waitingList);
       
-      userSocket = new ArrayList<GameUser>();
+      GamersList = new ArrayList<GameUser>();
       roomManger = new RoomManager();
    }
    
@@ -58,34 +58,27 @@ public class Server {
    }
    
    boolean sendRequestGame(String myNickName, String oppNickName) {
-	      Iterator<String> it = waitingList.keySet().iterator();
+	      try {
+	    	  DataOutputStream out = (DataOutputStream)waitingList.get(oppNickName);
+	    	  
+	    	  out.writeUTF("game request");
+	    	  out.writeUTF(myNickName);
+	    	  
+	    	  return true;
+	      } catch(IOException e) {}
 	      
-	      while(it.hasNext()) {
-	         try {
-	        	 if (it.equals(oppNickName)) {
-	        		 DataOutputStream out = (DataOutputStream)waitingList.get(it.next());
-	        		 DataInputStream in = (DataInputStream)waitingList.get(it.next());
-	        		
-	        		 out.writeUTF("battleRequest from others");
-	        		 out.writeUTF(myNickName);
-	        		 if(in.readUTF().equals("yes")) {
-	        			 return true;
-	        		 }
-	        		 else
-	        			 return false;
-	        	 }
-	         } catch(IOException e) {}
-	      }
 	      return false;
-	   }
+   }
    
    void sendToGameRoom(String msg, GameRoom room) {
       try {
-         DataOutputStream out = (DataOutputStream)room.userList.get(0).out;
-         out.writeUTF(msg);
+         DataOutputStream sendout = (DataOutputStream)room.userList.get(0).out;
+         sendout.writeUTF(msg);
          
-         out = (DataOutputStream)room.userList.get(1).out;
-         out.writeUTF(msg);
+         sendout = (DataOutputStream)room.userList.get(1).out;
+         sendout.writeUTF(msg);
+         
+         
       } catch(IOException e) {}
    }
 
@@ -97,6 +90,7 @@ public class Server {
       Socket socket;
       DataInputStream in;
       DataOutputStream out;
+      private String myNickName;
       
       ServerReceiver(Socket socket){
          this.socket = socket;
@@ -118,9 +112,9 @@ public class Server {
             System.out.println("The current number of server users : " + loginList.size());
             
             
-//            userSocket.add(new GameUser(name, socket));   // GameUser arrayList�� �߰�
-//            if (userSocket.size() % 2 == 0) {
-//               roomManger.CreateRoom(userSocket.get(0), userSocket.get(1));
+//            GamersList.add(new GameUser(name, socket));   // GameUser arrayList�� �߰�
+//            if (GamersList.size() % 2 == 0) {
+//               roomManger.CreateRoom(GamersList.get(0), GamersList.get(1));
 //            }
             
             
@@ -136,7 +130,8 @@ public class Server {
                     		out.writeUTF("Success");
                     		out.writeUTF(db.getNickName(id));
                     		loginList.remove(name);
-                    		waitingList.put(name, out);
+                    		waitingList.put(db.getNickName(id), out);
+                    		name = db.getNickName(id);
                     	}
                     	else
                     		out.writeUTF("Fail");
@@ -173,16 +168,44 @@ public class Server {
             			out.writeUTF(array[1]);
             		}
             		else if (query.equals("battleRequest")) {
-            			String myNickName = in.readUTF();
+            			myNickName = in.readUTF();
             			String oppNickName = in.readUTF();
             			if(sendRequestGame(myNickName, oppNickName)) {
-            				out.writeUTF("yes");
+            				String response = "";
+            				while(!response.equals("yes") && !response.equals("no")) {
+            					response = in.readUTF();
+            				}
+            				
+            				if(in.readUTF().equals("yes"))
+            					out.writeUTF("game start");
+            				else
+            					out.writeUTF("rejected");
             			}
             			else
             				out.writeUTF("no");
             			
             			
             			// 코드 ?
+            		}
+            		else if(query.equals("game request")) {
+            			String oppNickName = in.readUTF();
+            			out.writeUTF("battleRequest from others");
+            			out.writeUTF(oppNickName);
+            			
+            			if(in.readUTF().equals("yes")) {
+            				GamersList.add(new GameUser(myNickName, out));
+            				GamersList.add(new GameUser(oppNickName, (DataOutputStream)waitingList.get(oppNickName)));
+            				roomManger.CreateRoom(GamersList.get(GamersList.indexOf(myNickName)), GamersList.get(GamersList.indexOf(oppNickName)));
+            				
+            				DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
+            				resout.writeUTF("yes");
+            				out.writeUTF("game start");
+            				}
+            			else {
+            				DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
+            				resout.writeUTF("no");
+            			}
+            			
             		}
             		else if (query.equals("chat")) {
             			sendToAll(in.readUTF());

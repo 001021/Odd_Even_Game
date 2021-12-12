@@ -7,8 +7,8 @@ import java.util.*;
 public class WaitingRoomServer {
 	RoomManager roomManger;
 	
-	static HashMap<String, Object> waitingList;	// ´ë±â½Ç¿¡ waiting List
-	static ArrayList<GameUser> userSocket;		// user outputStream ¸ð¾Æ³õÀº hashMap
+	static HashMap<String, Object> waitingList;	// ï¿½ï¿½ï¿½Ç¿ï¿½ waiting List
+	static ArrayList<GameUser> userSocket;		// user outputStream ï¿½ï¿½Æ³ï¿½ï¿½ï¿½ hashMap
 
 	
 	WaitingRoomServer() {
@@ -65,7 +65,7 @@ public class WaitingRoomServer {
 		new WaitingRoomServer().start();
 	}
 	
-	class ServerReceiver extends Thread{	// Server Receiver À¯ÀúµéÀÇ Ã¤ÆÃ ¹Þ´Â °÷
+	class ServerReceiver extends Thread{	// Server Receiver ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½ ï¿½Þ´ï¿½ ï¿½ï¿½
 		Socket socket;
 		DataInputStream in;
 		DataOutputStream out;
@@ -86,7 +86,7 @@ public class WaitingRoomServer {
 				sendToAll("#" + name + " came in");
 				
 				waitingList.put(name, out);
-				userSocket.add(new GameUser(name, socket));	// GameUser arrayList¿¡ Ãß°¡
+				userSocket.add(new GameUser(name, socket));	// GameUser arrayListï¿½ï¿½ ï¿½ß°ï¿½
 				if (userSocket.size() % 2 == 0) {
 					roomManger.CreateRoom(userSocket.get(0), userSocket.get(1));
 				}
@@ -109,8 +109,8 @@ public class WaitingRoomServer {
 			} finally {
 				sendToAll("#" + name + " left");
 				waitingList.remove(name);
-				System.out.println("[" + socket.getInetAddress() + " : " +
-						socket.getPort() + "] connection closed");
+				System.ouprintln("[" + socket.getInetAddress() + " : " +
+						socket.t.getPort() + "] connection closed");
 				System.out.println("The current number of server users : " + waitingList.size());
 			}
 		}

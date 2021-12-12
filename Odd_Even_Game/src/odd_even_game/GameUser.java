@@ -22,14 +22,12 @@ public class GameUser {
 		this.nickName = nickName;
 	}
 	
-	public GameUser(String nickName, Socket socket) {
+	public GameUser(String nickName, DataOutputStream dataOutputStream) {
 		this.nickName = nickName;
-		this.socket = socket;
 		
 		try {
-			this.in = new DataInputStream(socket.getInputStream());
-			this.out = new DataOutputStream(socket.getOutputStream());
-		} catch(IOException e) {}
+			this.out = dataOutputStream;
+		} catch(Exception e) {}
 	}
 	
 	public GameUser(int id, String nickName) {
