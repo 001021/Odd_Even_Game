@@ -8,7 +8,7 @@ public class Database {
    //ID, nickname, duplicate check
    boolean checkDuplicate(String id, String nickName) {
       try {
-         String[] array;	// array[]-0: id, 1: pw, 2: name, 3: nickname, 4: email, 5: sns, 6:  date, 7: ip, 8: number of visits, 9: win, 10: lose
+         String[] array;	// array[]-0: id, 1: pw, 2: name, 3: nickname, 4: email, 5: sns, 6:  ip, 7: date, 8: number of visits, 9: win, 10: lose
          String fileName = "userDB.txt";
          FileReader fr = new FileReader(fileName);
          String line="";
@@ -174,8 +174,8 @@ public class Database {
            }
     }
     
-    //Last access time, number of visits updated
-    void updateConnection(String nickName, String time){
+    //Last access time, number of visits, and IP address updated
+    void updateConnection(String nickName, String time, InetAddress inetAddress){
        try {
              String[] array;
              
@@ -187,6 +187,7 @@ public class Database {
              while((line = br.readLine()) != null) {
               array=line.split("/");
                 if(nickName.equals(array[3])) {
+                	array[6] = String.valueOf(inetAddress);
                  array[7]=time;
                  int count=Integer.parseInt(array[8])+1;
                 array[8]=Integer.toString(count);
