@@ -102,7 +102,7 @@ public class Database {
           while((line=br.readLine())!=null){
              array=line.split("/");
                if(nickName.equals(array[3])==true) {
-                  result=nickName+": "+array[9]+"/"+array[10];
+            	   result = nickName + " : " +array[10]+"승 "+array[11]+"패";
                   return result;
                }
           }

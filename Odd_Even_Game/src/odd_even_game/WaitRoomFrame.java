@@ -131,13 +131,14 @@ public class WaitRoomFrame extends JFrame{
               	
               	 // 누구한테 신청할 것인지?
                 String oppID = JOptionPane.showInputDialog("정보를 보고싶은 상대의 NickName을 입력하세요.");
-              	
+                
               	if(oppID != null)
               		out.writeUTF(oppID);
-              	int win = Integer.parseInt(in.readUTF());
-    			int lose = Integer.parseInt(in.readUTF());
-    			
-    			new MemberInfoFrame(oppID, win, lose);
+
+//              	JOptionPane.showMessageDialog(null, win_lose, "a", JOptionPane.PLAIN_MESSAGE);
+//    			
+//    			
+////    			new MemberInfoFrame(oppID, win, lose);
     			
   			} catch (IOException e) {}
           }
@@ -225,7 +226,7 @@ public class WaitRoomFrame extends JFrame{
             		}
 					
 					if(query.equals("game start")) {
-						JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
+						JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", "[" + nickName + "] 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
 						new GameRoomAttackFrame(socket, nickName);
 					}
 					else if(query.equals("rejected")) {
@@ -236,6 +237,11 @@ public class WaitRoomFrame extends JFrame{
 					else if(query.equals("Error : write correct nickname")) {
 						String oppNickName = in.readUTF();
 						JOptionPane.showMessageDialog(null, oppNickName + "님을 찾을 수 없습니다...", " 검 색 실 패", JOptionPane.PLAIN_MESSAGE);
+					}
+					
+					else if(query.equals("memberInfo res")) {
+						String info = in.readUTF();
+		              	JOptionPane.showMessageDialog(null, info, "정 보 보 기", JOptionPane.PLAIN_MESSAGE);
 					}
 					
 				} catch(IOException e) {}

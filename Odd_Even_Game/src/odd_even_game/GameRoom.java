@@ -7,6 +7,7 @@ import java.util.List;
 public class GameRoom {
 	List<GameUser> userList;
 	String roomName;
+	boolean ready1 = false, ready2 = false;
 	
 	public GameRoom() {	
 		userList = new ArrayList<GameUser>();
@@ -17,13 +18,19 @@ public class GameRoom {
 		userList.add(user1);
 		userList.add(user2);
 		
-		try {
-			user1.out.writeUTF("Welcome");
-			user2.out.writeUTF("Welcome");
-		} catch (IOException e) {}
+//		try {
+//			user1.out.writeUTF("Welcome");
+//			user2.out.writeUTF("Welcome");
+//		} catch (IOException e) {}
 	}
 	
 	public void ExitGame(GameUser user) {	//Exit game
-		WaitingRoomServer.RoomManager.RemoveRoom(this);
+		Server.RoomManager.RemoveRoom(this);
+	}
+	
+	public boolean checkAllReady() {
+		if(ready1 == true && ready2 == true)
+			return true;
+		return false;
 	}
 }

@@ -66,15 +66,6 @@ public class GameRoomAttackFrame extends JFrame{
 	 * Create the application.
 	 */
 	public GameRoomAttackFrame(Socket socket, final String nickName) {
-		setTitle("홀짝게임 스타트! - 공격");
-		setSize(523, 460);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		contentPane = new JPanel();
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		setVisible(true);
-
 		this.socket = socket;
 		try {
 			out = new DataOutputStream(socket.getOutputStream());
@@ -83,7 +74,16 @@ public class GameRoomAttackFrame extends JFrame{
 		
 		Thread receiver = new Thread(new ClientReceiver(socket));
 		receiver.start();
-
+		
+		setTitle("[" + nickName + "] 홀짝게임 스타트! - 공격");
+		setSize(523, 460);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		contentPane = new JPanel();
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		setVisible(true);
+		
 		//		JPanel JScrollpane = new JPanel();
 		//		JScrollpane.setBorder(new LineBorder(new Color(0, 0, 0)));
 		//		JScrollpane.setBackground(Color.WHITE);
@@ -168,24 +168,25 @@ public class GameRoomAttackFrame extends JFrame{
 			}
 		});
 
-		String response = "";
-		while(!response.equals("ready") && !response.equals("no")) {
-			try {
-				response = in.readUTF();
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-			System.out.println(response);
-		}
+//		String response = "";
+//		while(!response.equals("ready") && !response.equals("no")) {
+//			try {
+//				response = in.readUTF();
+//			} catch (IOException e2) {
+//				// TODO Auto-generated catch block
+//				e2.printStackTrace();
+//			}
+//			System.out.println(response);
+//		}
+//
+//		if(response.equals("ready")) {
+//			readyButton.setVisible(false);
+//		}
+//		else if(response.equals("no")) {
+//			JOptionPane.showMessageDialog(null, "아직 준비 완료가 되지 않았나봅니다!", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
+//		}
 
-		if(response.equals("ready")) {
-			readyButton.setVisible(false);
-		}
-		else if(response.equals("no")) {
-			JOptionPane.showMessageDialog(null, "아직 준비 완료가 되지 않았나봅니다!", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
-		}
-
+		
 		//		// 둘 다 준비 완료가 되면
 		//		if (user1.ready == 1 && user2.ready == 2) {
 		//		 // 버튼 사라짐
@@ -246,11 +247,11 @@ public class GameRoomAttackFrame extends JFrame{
 		add(textField);
 		textField.setColumns(10);
 
-		JButton btnNewButton_2 = new JButton("Send");
-		btnNewButton_2.setBackground(new Color(230, 230, 250));
-		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
-		btnNewButton_2.setBounds(298, 228, 52, 31);
-		add(btnNewButton_2);
+//		JButton btnNewButton_2 = new JButton("Send");
+//		btnNewButton_2.setBackground(new Color(230, 230, 250));
+//		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
+//		btnNewButton_2.setBounds(298, 228, 52, 31);
+//		add(btnNewButton_2);
 	}
 
 	private void sendReady() {
@@ -277,11 +278,11 @@ public class GameRoomAttackFrame extends JFrame{
 				try {
 					String query = in.readUTF();
 
-					if (query.equals("chating in")) {
+					if (query.equals("game chating in")) {
 						display.append(in.readUTF());
 						tfChat.selectAll();
 					}
-					else if (query.equals("ready")) {
+					else if (query.equals("all ready")) {
 						int result = JOptionPane.showConfirmDialog(null, "상대방 준비 완료! 게임을 시작하시겠습니까?", "준비", JOptionPane.YES_NO_OPTION);
 						if (result == JOptionPane.CLOSED_OPTION) {
 							// 사용자가 "예", "아니오"의 선택 없이 다이얼로그 창을 닫은 경우

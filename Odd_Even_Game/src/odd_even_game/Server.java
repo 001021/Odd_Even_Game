@@ -76,15 +76,27 @@ public class Server {
    
    void sendToGameRoom(String msg, GameRoom room) {
       try {
-         DataOutputStream sendout = (DataOutputStream)room.userList.get(0).out;
-         sendout.writeUTF(msg);
+         DataOutputStream sendout1 = (DataOutputStream)room.userList.get(0).out;
+         sendout1.writeUTF("game chating in");
+         sendout1.writeUTF(msg);
          
-         sendout = (DataOutputStream)room.userList.get(1).out;
-         sendout.writeUTF(msg);
-         
+         DataOutputStream sendout2 = (DataOutputStream)room.userList.get(1).out;
+         sendout2.writeUTF("game chating in");
+         sendout2.writeUTF(msg);
          
       } catch(IOException e) {}
    }
+   
+   void GameRoomAllReady(GameRoom room) {
+	      try {
+	         DataOutputStream sendout1 = (DataOutputStream)room.userList.get(0).out;
+	         sendout1.writeUTF("all ready");
+	         
+	         DataOutputStream sendout2 = (DataOutputStream)room.userList.get(1).out;
+	         sendout2.writeUTF("all ready");
+	         
+	      } catch(IOException e) {}
+	   }
 
    public static void main(String[] args) {
       new Server().start();
@@ -110,23 +122,16 @@ public class Server {
          try {
             name = in.readUTF();
             System.out.println(name);
-//            sendToAll("#" + name + " came in");
             
             loginList.put(name, out);
             System.out.println("The current number of server users : " + loginList.size());
             
             
-//            GamersList.add(new GameUser(name, socket));   // GameUser arrayList�� �߰�
-//            if (GamersList.size() % 2 == 0) {
-//               roomManger.CreateRoom(GamersList.get(0), GamersList.get(1));
-//            }
-            
-            
-            
             while(in != null) {
             	if (loginList.get(name) != null) {
+            		String query = in.readUTF();
             		
-            		if(in.readUTF().equals("login")) {
+            		if(query.equals("login")) {
             			String id = in.readUTF();
                     	String password = in.readUTF();
                     	
@@ -164,12 +169,13 @@ public class Server {
             	
             	else if (waitingList.get(name) != null) {
             		String query = in.readUTF();
+            		
             		if(query.equals("memberInfo")) {
             			String nickName = in.readUTF();
             			String info = db.getUserInfo(nickName);
-            			String[] array =info.split("/");
-            			out.writeUTF(array[0]);
-            			out.writeUTF(array[1]);
+            			
+            			out.writeUTF("memberInfo res");
+            			out.writeUTF(info);
             		}
             		else if (query.equals("battleRequest")) {
             			System.out.println("battleRequest");
@@ -184,7 +190,6 @@ public class Server {
             			
             			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
             			resout.writeUTF("game start");
-            			resout.writeUTF(name);
             			out.writeUTF("game start");
             			
             			GameUser user1 = new GameUser(myNickName, out);
@@ -206,17 +211,32 @@ public class Server {
             	}
             	
             	else {
+            		String query = in.readUTF();
+            		int gameRoomNum = 0;
+            		
             		for(int i=0; i < RoomManager.roomList.size(); i++) {
             			if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
-            				sendToGameRoom(in.readUTF(), RoomManager.roomList.get(i));
+            				gameRoomNum = i;
             				break;
             			}
             		}
+            		
+            		if(query.equals("chat")) {
+            			String msg = in.readUTF();
+            			sendToGameRoom(msg, RoomManager.roomList.get(gameRoomNum));
+            		}
+            		
+            		else if(query.equals("ready")) {
+            			if(RoomManager.roomList.get(gameRoomNum).checkAllReady())
+            				GameRoomAllReady(RoomManager.roomList.get(gameRoomNum));
+            		}
+            		
+            		
             	}
             }// while(in != null)
             
          } catch(IOException e) {
-            
+        	 System.out.println(e);
          } finally {
             sendToAll("#" + name + " left");
             loginList.remove(name);
@@ -237,10 +257,11 @@ public class Server {
       GameRoom CreateRoom(GameUser user1, GameUser user2) {
          GameRoom room = new GameRoom(user1, user2);
          roomList.add(room);
-         System.out.println("Room Created!");
          
          waitingList.remove(user1.nickName);
          waitingList.remove(user2.nickName);
+         
+         System.out.println("Room Created!");
          
          return room;
       }
