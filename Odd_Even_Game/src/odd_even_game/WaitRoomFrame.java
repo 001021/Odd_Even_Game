@@ -34,7 +34,7 @@ public class WaitRoomFrame extends JFrame{
 
 
 
-   public WaitRoomFrame(Socket socket, final String nickName) {
+   public WaitRoomFrame(final Socket socket, final String nickName) {
       setTitle("Waiting Room");
       
       this.socket = socket;
@@ -126,6 +126,8 @@ public class WaitRoomFrame extends JFrame{
 					JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
 					
 					// 여기다가 게임 레디룸 띄우기
+					new GameRoomFrame(socket, nickName);
+					
 				}
 				else if(response.equals("rejected"))
 					JOptionPane.showMessageDialog(null, oppID + "님께서 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
