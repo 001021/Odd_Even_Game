@@ -114,12 +114,13 @@ public class WaitRoomFrame extends JFrame{
 				
 				oppID = JOptionPane.showInputDialog("대결을 신청할 상대의 NickName을 입력하세요.");
 				out.writeUTF(oppID);
-				
+	            new WaitingDialog();
 //				JOptionPane.showMessageDialog(null, "대결 수락을 기다리는 중...", " 대 결 대 기", JOptionPane.PLAIN_MESSAGE);
 				String response = "";
 				while(!response.equals("game start") && !response.equals("rejected") && !response.equals("Error : write correct nickname")) {
 					response = in.readUTF();
 					System.out.println(response);
+		            WaitingDialog.dispose();
 				}
 				
 				if(response.equals("game start")) {
