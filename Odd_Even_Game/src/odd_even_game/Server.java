@@ -61,6 +61,9 @@ public class Server {
 	      try {
 	    	  DataOutputStream sendout = (DataOutputStream)waitingList.get(oppNickName);
 	    	  
+	    	  if(sendout == null)
+	    		  return false;
+	    	  
 	    	  sendout.writeUTF("battleRequest from others");
 	    	  sendout.writeUTF(myNickName);
 	    	  
@@ -173,6 +176,7 @@ public class Server {
             			String oppNickName = in.readUTF();
             			if(!sendRequestGame(name, oppNickName))
             				out.writeUTF("Error : write correct nickname");
+            			out.writeUTF(oppNickName);
             		}
             		
             		else if(query.equals("yes")) {
@@ -180,6 +184,7 @@ public class Server {
             			
             			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
             			resout.writeUTF("game start");
+            			resout.writeUTF(name);
             			out.writeUTF("game start");
             			
             			GameUser user1 = new GameUser(myNickName, out);
@@ -199,7 +204,7 @@ public class Server {
             			sendToAll(in.readUTF());
             		}
             	}
-            		
+            	
             	else {
             		for(int i=0; i < RoomManager.roomList.size(); i++) {
             			if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
