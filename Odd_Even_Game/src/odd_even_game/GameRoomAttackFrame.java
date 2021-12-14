@@ -50,7 +50,7 @@ public class GameRoomAttackFrame extends JFrame{
 	private JPanel contentPane;
 	private JTextField textField;
 
-	static Socket socket = null;
+	Socket socket = null;
 	static DataOutputStream out;
 	static DataInputStream in;
 	public boolean isClickReadyBtn = false;
@@ -80,7 +80,7 @@ public class GameRoomAttackFrame extends JFrame{
 			out = new DataOutputStream(socket.getOutputStream());
 			in = new DataInputStream(socket.getInputStream());
 		} catch(Exception e) {}
-
+		
 		Thread receiver = new Thread(new ClientReceiver(socket));
 		receiver.start();
 

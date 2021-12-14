@@ -26,7 +26,7 @@ public class WaitRoomFrame extends JFrame{
    JButton b3, b5, b6;
    JScrollBar bar;
    
-   static String nickName = null;
+   String nickName = null;
    
 	Socket socket=null;
     static DataOutputStream out;
@@ -44,7 +44,7 @@ public class WaitRoomFrame extends JFrame{
           in = new DataInputStream(socket.getInputStream());
       } catch(Exception e) {}
       
-      Thread receiver = new Thread(new ClientReceiver(socket));
+      Thread receiver = new Thread(new ClientReceiver(socket, nickName));
       receiver.start();
 
       // 접속자 정보 출력
@@ -183,8 +183,10 @@ public class WaitRoomFrame extends JFrame{
 	static class ClientReceiver extends Thread{
 		Socket socket;
 		DataInputStream in;
+		String nickName;
 		
-		ClientReceiver(Socket socket){
+		ClientReceiver(Socket socket, String nickName){
+			this.nickName = nickName;
 			this.socket = socket;
 			try {
 				in = new DataInputStream(socket.getInputStream());
