@@ -117,7 +117,7 @@ public class WaitRoomFrame extends JFrame{
 				
 //				JOptionPane.showMessageDialog(null, "대결 수락을 기다리는 중...", " 대 결 대 기", JOptionPane.PLAIN_MESSAGE);
 				String response = "";
-				while(!response.equals("game start") && !response.equals("rejected")) {
+				while(!response.equals("game start") && !response.equals("rejected") && !response.equals("Error : write correct nickname")) {
 					response = in.readUTF();
 					System.out.println(response);
 				}
@@ -126,10 +126,11 @@ public class WaitRoomFrame extends JFrame{
 					JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
 					
 					// 여기다가 게임 레디룸 띄우기
-					
 				}
-				else
+				else if(response.equals("rejected"))
 					JOptionPane.showMessageDialog(null, oppID + "님께서 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
+				else
+					JOptionPane.showMessageDialog(null, oppID + "님을 찾을 수 없습니다...", " 검 색 실 패", JOptionPane.PLAIN_MESSAGE);
 				
         	  } catch (IOException e) {}
           }
@@ -218,15 +219,16 @@ public class WaitRoomFrame extends JFrame{
 			            tfChat.selectAll();
             		}
             		else if (query.equals("battleRequest from others")) { // *************************************************************************
-            			String nickName = in.readUTF();
+            			String oppNickName = in.readUTF();
 
             			// 상대방에게 가는 메시지
                         // confirm dialog의 리턴값 : YES == 0 NO == 1 X == -1 (팝업 종료)
-                        int YorN = JOptionPane.showConfirmDialog(null, nickName + "님으로부터 대결 신청!\n수락하시겠습니까?", " 대 결 신 청", JOptionPane.YES_NO_OPTION);
+                        int YorN = JOptionPane.showConfirmDialog(null, oppNickName + "님으로부터 대결 신청!\n수락하시겠습니까?", " 대 결 신 청", JOptionPane.YES_NO_OPTION);
                         
                         if (YorN == 0) {
                            JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
                            out.writeUTF("yes");
+                           out.writeUTF(oppNickName);
                            
                            if(in.readUTF().equals("game start"))
            					JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
@@ -234,9 +236,10 @@ public class WaitRoomFrame extends JFrame{
                         
                         else {
                             // 상대방에게 가는 메세지
-                            JOptionPane.showMessageDialog(null, nickName + "님과의 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
-                         // 나에게 오는 메세지
+                            JOptionPane.showMessageDialog(null, oppNickName + "님과의 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
+                            // 나에게 오는 메세지
                             out.writeUTF("no");
+                            out.writeUTF(oppNickName);
                          }
             		}
 				} catch(IOException e) {}

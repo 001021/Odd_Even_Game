@@ -61,10 +61,10 @@ public class Server {
 	      try {
 	    	  DataOutputStream sendout = (DataOutputStream)waitingList.get(oppNickName);
 	    	  
-	    	  sendout.writeUTF("game request");
+	    	  sendout.writeUTF("battleRequest from others");
 	    	  sendout.writeUTF(myNickName);
 	    	  
-	    	  System.out.println("game request return true");
+	    	  System.out.println("battleRequest from others");
 	    	  return true;
 	      } catch(IOException e) {}
 	      
@@ -171,43 +171,28 @@ public class Server {
             		else if (query.equals("battleRequest")) {
             			System.out.println("battleRequest");
             			String oppNickName = in.readUTF();
-            			if(sendRequestGame(name, oppNickName)) {
-            				String response = "";
-            				while(!response.equals("yes") && !response.equals("no")) {
-            					response = in.readUTF();
-            				}
-            				
-            				if(in.readUTF().equals("yes"))
-            					out.writeUTF("game start");
-            				else
-            					out.writeUTF("rejected");
-            			}
-            			else
-            				out.writeUTF("no");
-            			
-            			
-            			// 코드 ?
+            			if(!sendRequestGame(name, oppNickName))
+            				out.writeUTF("Error : write correct nickname");
             		}
-            		else if(query.equals("game request")) {
+            		
+            		else if(query.equals("yes")) {
             			String oppNickName = in.readUTF();
-            			System.out.println("battleRequest from others");
-            			out.writeUTF("battleRequest from others");
-            			out.writeUTF(oppNickName);
             			
-            			if(in.readUTF().equals("yes")) {
-            				GamersList.add(new GameUser(myNickName, out));
-            				GamersList.add(new GameUser(oppNickName, (DataOutputStream)waitingList.get(oppNickName)));
-            				roomManger.CreateRoom(GamersList.get(GamersList.indexOf(myNickName)), GamersList.get(GamersList.indexOf(oppNickName)));
-            				
-            				DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
-            				resout.writeUTF("yes");
-            				out.writeUTF("game start");
-            				}
-            			else {
-            				DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
-            				resout.writeUTF("no");
-            			}
+            			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
+            			resout.writeUTF("game start");
+            			out.writeUTF("game start");
             			
+            			GameUser user1 = new GameUser(myNickName, out);
+            			GameUser user2 = new GameUser(oppNickName, (DataOutputStream)waitingList.get(oppNickName));
+            			GamersList.add(user1);
+            			GamersList.add(user2);
+            			roomManger.CreateRoom(user1, user2);
+            		}
+            		
+            		else if(query.equals("no")) {
+            			String oppNickName = in.readUTF();
+            			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
+            			resout.writeUTF("rejected");
             		}
             		
             		else if (query.equals("chat")) {
