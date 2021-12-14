@@ -120,16 +120,16 @@ public class WaitRoomFrame extends JFrame{
 				while(!response.equals("game start") && !response.equals("rejected") && !response.equals("Error : write correct nickname")) {
 					response = in.readUTF();
 					System.out.println(response);
-		            WaitingDialog.dispose();
 				}
 				
 				if(response.equals("game start")) {
 					JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
-					
 					// 여기다가 게임 레디룸 띄우기
+		            new GameRoomFrame();
 				}
-				else if(response.equals("rejected"))
+				else if(response.equals("rejected")) {
 					JOptionPane.showMessageDialog(null, oppID + "님께서 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
+				}
 				else
 					JOptionPane.showMessageDialog(null, oppID + "님을 찾을 수 없습니다...", " 검 색 실 패", JOptionPane.PLAIN_MESSAGE);
 				

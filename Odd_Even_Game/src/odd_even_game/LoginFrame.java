@@ -88,6 +88,7 @@ public class LoginFrame extends JFrame {
                 	JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
                 	// User가 로그인 했을 때 뜨는 창으로 연결
                 	new WaitRoomFrame(socket, nickName);
+                	dispose();
                 }
                 else {
                 	JOptionPane.showMessageDialog(null, "로그인 실패");
