@@ -59,11 +59,12 @@ public class Server {
    
    boolean sendRequestGame(String myNickName, String oppNickName) {
 	      try {
-	    	  DataOutputStream out = (DataOutputStream)waitingList.get(oppNickName);
+	    	  DataOutputStream sendout = (DataOutputStream)waitingList.get(oppNickName);
 	    	  
-	    	  out.writeUTF("game request");
-	    	  out.writeUTF(myNickName);
+	    	  sendout.writeUTF("game request");
+	    	  sendout.writeUTF(myNickName);
 	    	  
+	    	  System.out.println("game request return true");
 	    	  return true;
 	      } catch(IOException e) {}
 	      
@@ -168,9 +169,9 @@ public class Server {
             			out.writeUTF(array[1]);
             		}
             		else if (query.equals("battleRequest")) {
-            			myNickName = in.readUTF();
+            			System.out.println("battleRequest");
             			String oppNickName = in.readUTF();
-            			if(sendRequestGame(myNickName, oppNickName)) {
+            			if(sendRequestGame(name, oppNickName)) {
             				String response = "";
             				while(!response.equals("yes") && !response.equals("no")) {
             					response = in.readUTF();
@@ -189,6 +190,7 @@ public class Server {
             		}
             		else if(query.equals("game request")) {
             			String oppNickName = in.readUTF();
+            			System.out.println("battleRequest from others");
             			out.writeUTF("battleRequest from others");
             			out.writeUTF(oppNickName);
             			
@@ -207,6 +209,7 @@ public class Server {
             			}
             			
             		}
+            		
             		else if (query.equals("chat")) {
             			sendToAll(in.readUTF());
             		}

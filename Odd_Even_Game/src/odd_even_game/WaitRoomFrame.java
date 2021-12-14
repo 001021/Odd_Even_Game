@@ -65,7 +65,6 @@ public class WaitRoomFrame extends JFrame{
 
       inputPane = new JPanel();
 
-
       tfChat = new JTextField(25);
       JButton sendBtn = new JButton("send");
       
@@ -114,7 +113,6 @@ public class WaitRoomFrame extends JFrame{
 				out.writeUTF("battleRequest");
 				
 				oppID = JOptionPane.showInputDialog("대결을 신청할 상대의 NickName을 입력하세요.");
-				out.writeUTF(nickName);
 				out.writeUTF(oppID);
 				
 //				JOptionPane.showMessageDialog(null, "대결 수락을 기다리는 중...", " 대 결 대 기", JOptionPane.PLAIN_MESSAGE);
