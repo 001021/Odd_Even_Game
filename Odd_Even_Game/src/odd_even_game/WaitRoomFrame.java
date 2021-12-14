@@ -26,7 +26,7 @@ public class WaitRoomFrame extends JFrame{
    JButton b3, b5, b6;
    JScrollBar bar;
    
-   String nick = null;
+   static String nickName = null;
    
 	Socket socket=null;
     static DataOutputStream out;
@@ -38,6 +38,7 @@ public class WaitRoomFrame extends JFrame{
       setTitle("Waiting Room");
       
       this.socket = socket;
+      this.nickName = nickName;
       try {
           out = new DataOutputStream(socket.getOutputStream());
           in = new DataInputStream(socket.getInputStream());
@@ -114,24 +115,8 @@ public class WaitRoomFrame extends JFrame{
 				
 				oppID = JOptionPane.showInputDialog("대결을 신청할 상대의 NickName을 입력하세요.");
 				out.writeUTF(oppID);
-//				JOptionPane.showMessageDialog(null, "대결 수락을 기다리는 중...", " 대 결 대 기", JOptionPane.PLAIN_MESSAGE);
-				String response = "";
-				while(!response.equals("game start") && !response.equals("rejected") && !response.equals("Error : write correct nickname")) {
-					response = in.readUTF();
-					System.out.println(response);
-				}
 				
-				if(response.equals("game start")) {
-					JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
-					// 여기다가 게임 레디룸 띄우기
-		            new GameRoomAttackFrame(socket, nickName);
-				}
-				else if(response.equals("rejected")) {
-					JOptionPane.showMessageDialog(null, oppID + "님께서 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
-				}
-				else
-					JOptionPane.showMessageDialog(null, oppID + "님을 찾을 수 없습니다...", " 검 색 실 패", JOptionPane.PLAIN_MESSAGE);
-				
+				JOptionPane.showMessageDialog(null, oppID + "님에게 대결을 신청했습니다!", " 대 결 신 청", JOptionPane.PLAIN_MESSAGE);
         	  } catch (IOException e) {}
           }
       });
@@ -157,8 +142,6 @@ public class WaitRoomFrame extends JFrame{
   			} catch (IOException e) {}
           }
        });
-      
-      
       
       
 
@@ -226,13 +209,8 @@ public class WaitRoomFrame extends JFrame{
                         int YorN = JOptionPane.showConfirmDialog(null, oppNickName + "님으로부터 대결 신청!\n수락하시겠습니까?", " 대 결 신 청", JOptionPane.YES_NO_OPTION);
                         
                         if (YorN == 0) {
-                           JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
                            out.writeUTF("yes");
                            out.writeUTF(oppNickName);
-                           
-                           if(in.readUTF().equals("game start"))
-           					JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
-                           new GameRoomFrame();
                         }
                         
                         else {
@@ -243,6 +221,21 @@ public class WaitRoomFrame extends JFrame{
                             out.writeUTF(oppNickName);
                          }
             		}
+					
+					if(query.equals("game start")) {
+						JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", " 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
+						new GameRoomAttackFrame(socket, nickName);
+					}
+					else if(query.equals("rejected")) {
+						String oppNickName = in.readUTF();
+						JOptionPane.showMessageDialog(null, oppNickName + "님께서 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
+					}
+					
+					else if(query.equals("Error : write correct nickname")) {
+						String oppNickName = in.readUTF();
+						JOptionPane.showMessageDialog(null, oppNickName + "님을 찾을 수 없습니다...", " 검 색 실 패", JOptionPane.PLAIN_MESSAGE);
+					}
+					
 				} catch(IOException e) {}
 			}
 		}
