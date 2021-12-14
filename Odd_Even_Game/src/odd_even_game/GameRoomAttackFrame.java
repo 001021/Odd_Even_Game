@@ -16,11 +16,18 @@ import javax.swing.Action;
 import javax.swing.BoxLayout;
 import java.awt.Color;
 import javax.swing.border.LineBorder;
+
+import odd_even_game.WaitRoomFrame.ClientReceiver;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.JTextField;
@@ -29,8 +36,8 @@ import javax.swing.SwingConstants;
 
 public class GameRoomAttackFrame {
 	JPanel pane;
-	JTextArea display;
-	JTextField tfChat;
+	static JTextArea display;
+	static JTextField tfChat;
 	JButton sendBtn;
 	JPanel inputPane;
 	
@@ -40,6 +47,10 @@ public class GameRoomAttackFrame {
 	
 	private JFrame frame;
 	private JTextField textField;
+	
+	Socket socket = null;
+	DataOutputStream out;
+	DataInputStream in;
 
 	/**
 	 * Launch the application.
@@ -62,20 +73,29 @@ public class GameRoomAttackFrame {
 	/**
 	 * Create the application.
 	 */
-	public GameRoomAttackFrame() {
-		initialize();
+	public GameRoomAttackFrame(Socket socket, final String nickName) {
+		initialize(socket, nickName);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(Socket socket, final String nickName) {
 		frame = new JFrame();
 		frame.setTitle("홀짝게임 스타트! - 공격");
 		frame.setSize(523, 460);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		
+		this.socket = socket;
+		try {
+			out = new DataOutputStream(socket.getOutputStream());
+	          in = new DataInputStream(socket.getInputStream());
+	      } catch(Exception e) {}
+		
+	    Thread receiver = new Thread(new ClientReceiver(socket));
+	    receiver.start();
 		
 //		JPanel JScrollpane = new JPanel();
 //		JScrollpane.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -97,8 +117,10 @@ public class GameRoomAttackFrame {
 		JButton sendBtn = new JButton("send");
 		sendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				display.append(  "[" + nick + "님]: " + tfChat.getText() + "\n");
-				tfChat.selectAll();
+				try {
+					out.writeUTF("chat");
+					out.writeUTF("[" + nickName + "] " + tfChat.getText() + "\n");
+				} catch (IOException e1) {}
 			}
 		});
 		
@@ -115,8 +137,13 @@ public class GameRoomAttackFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				display.append( "[" + nick + "님]: " + tfChat.getText() + "\n");
-				tfChat.selectAll();
+				try {
+					out.writeUTF("chat");
+					out.writeUTF("[" + nickName + "] " + tfChat.getText() + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			}
 		};
@@ -145,15 +172,20 @@ public class GameRoomAttackFrame {
 		readyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
 				// 버튼 누르면 서버에게 준비 완료되었음을 전송
-				readyButton.setVisible(false);
+				try {
+					out.writeUTF("ready");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		
 		// 둘 다 준비 완료가 되면
-//		if (user1.ready == 1 && user2.ready == 2) {
-		// 버튼 사라짐
-//			readyButton.setVisible(false);
-//		}
+		if (user1.ready == 1 && user2.ready == 2) {
+		 // 버튼 사라짐
+			readyButton.setVisible(false);
+		}
 		
 		final String oppMessage = "홀";
 		
@@ -214,6 +246,34 @@ public class GameRoomAttackFrame {
 //		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
 //		btnNewButton_2.setBounds(298, 228, 52, 31);
 //		frame.getContentPane().add(btnNewButton_2);
+	}
+	
+	static class ClientReceiver extends Thread {
+		Socket socket;
+		DataInputStream in;
+		
+		ClientReceiver(Socket socket) {
+			this.socket = socket;
+			try {
+				in = new DataInputStream(socket.getInputStream());
+			} catch(IOException e) {}
+		}
+		
+		public void run() {
+			while (in != null) {
+				try {
+					String query = in.readUTF();
+					
+					if (query.equals("chating in")) {
+						display.append(in.readUTF());
+						tfChat.selectAll();
+					}
+					else if (query.equals("ready")) {
+						
+					}
+				}
+			}
+		}
 	}
 	
 	
