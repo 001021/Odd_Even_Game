@@ -35,20 +35,21 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
-public class GameRoomAttackFrame {
+public class GameRoomAttackFrame extends JFrame{
 	JPanel pane;
 	static JTextArea display;
 	static JTextField tfChat;
 	JButton sendBtn;
 	JPanel inputPane;
-	
+
 	static String nick = null;
 	int win;
 	int lose;
-	
+
 	private JFrame frame;
+	private JPanel contentPane;
 	private JTextField textField;
-	
+
 	static Socket socket = null;
 	static DataOutputStream out;
 	static DataInputStream in;
@@ -60,65 +61,35 @@ public class GameRoomAttackFrame {
 	public int userTurn = 0; // 접속하는 클라이언트에게 턴을 부여해주는 변수
 	public int selectTurn = 1; // 누가 턴인지 정하는 변수
 	public String clientID; // 클라이언트 아이디를 담는 변수
-	
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GameRoomAttackFrame window = new GameRoomAttackFrame(socket, nick);
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		
-		
-	}
 
 	/**
 	 * Create the application.
 	 */
 	public GameRoomAttackFrame(Socket socket, final String nickName) {
-		try {
-			initialize(socket, nickName);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+		setTitle("홀짝게임 스타트! - 공격");
+		setSize(523, 460);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		contentPane = new JPanel();
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		setVisible(true);
 
-	/**
-	 * Initialize the contents of the frame.
-	 * @throws IOException 
-	 */
-	private void initialize(Socket socket, final String nickName) throws IOException {
-		frame = new JFrame();
-		frame.setTitle("홀짝게임 스타트! - 공격");
-		frame.setSize(523, 460);
-		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
-		
 		this.socket = socket;
 		try {
 			out = new DataOutputStream(socket.getOutputStream());
-	          in = new DataInputStream(socket.getInputStream());
-	      } catch(Exception e) {}
-		
-	    Thread receiver = new Thread(new ClientReceiver(socket));
-	    receiver.start();
-		
-//		JPanel JScrollpane = new JPanel();
-//		JScrollpane.setBorder(new LineBorder(new Color(0, 0, 0)));
-//		JScrollpane.setBackground(Color.WHITE);
-//		JScrollpane.setBounds(10, 12, 340, 217);
-//		frame.getContentPane().add(JScrollpane);
-		
+			in = new DataInputStream(socket.getInputStream());
+		} catch(Exception e) {}
+
+		Thread receiver = new Thread(new ClientReceiver(socket));
+		receiver.start();
+
+		//		JPanel JScrollpane = new JPanel();
+		//		JScrollpane.setBorder(new LineBorder(new Color(0, 0, 0)));
+		//		JScrollpane.setBackground(Color.WHITE);
+		//		JScrollpane.setBounds(10, 12, 340, 217);
+		//		frame.getContentPane().add(JScrollpane);
+
 		pane = new JPanel();
 		display = new JTextArea(11, 30);
 		display.setEditable(false);
@@ -139,16 +110,16 @@ public class GameRoomAttackFrame {
 				} catch (IOException e1) {}
 			}
 		});
-		
+
 		inputPane.setBounds(10, 228, 270, 31);
 		sendBtn.setBounds(285, 230, 65, 25);
 		inputPane.add(tfChat);
-		
-		frame.getContentPane().add(js3);
-		frame.getContentPane().add(inputPane);
-		frame.getContentPane().add(sendBtn);
-		
-		
+
+		add(js3);
+		add(inputPane);
+		add(sendBtn);
+
+
 		Action ok = new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -168,23 +139,23 @@ public class GameRoomAttackFrame {
 		tfChat.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "ENTER");
 		tfChat.getActionMap().put("ENTER", ok);
 
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_1.setBackground(Color.WHITE);
 		panel_1.setBounds(360, 12, 147, 247);
-		frame.getContentPane().add(panel_1);
-		
+		add(panel_1);
+
 		JLabel lblNewLabel = new JLabel("\uD68C\uC6D0 \uC815\uBCF4 \uBCF4\uAE30");
 		panel_1.add(lblNewLabel);
-		
+
 		final JButton readyButton = new JButton("준비 완료!");
 		readyButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 30));
 		readyButton.setBackground(new Color(200, 200, 255));
 		readyButton.setBounds(10, 270, 497, 155);
-		
-		frame.getContentPane().add(readyButton);
-		
+
+		add(readyButton);
+
 		readyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
 				// 버튼 누르면 서버에게 준비 완료되었음을 전송
@@ -196,13 +167,18 @@ public class GameRoomAttackFrame {
 				}
 			}
 		});
-		
+
 		String response = "";
 		while(!response.equals("ready") && !response.equals("no")) {
-			response = in.readUTF();
+			try {
+				response = in.readUTF();
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
 			System.out.println(response);
 		}
-		
+
 		if(response.equals("ready")) {
 			readyButton.setVisible(false);
 		}
@@ -210,14 +186,14 @@ public class GameRoomAttackFrame {
 			JOptionPane.showMessageDialog(null, "아직 준비 완료가 되지 않았나봅니다!", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
 		}
 
-//		// 둘 다 준비 완료가 되면
-//		if (user1.ready == 1 && user2.ready == 2) {
-//		 // 버튼 사라짐
-//			readyButton.setVisible(false);
-//		}
-		
+		//		// 둘 다 준비 완료가 되면
+		//		if (user1.ready == 1 && user2.ready == 2) {
+		//		 // 버튼 사라짐
+		//			readyButton.setVisible(false);
+		//		}
+
 		final String oppMessage = "홀";
-		
+
 		// 공격이 홀을 눌렀을 때
 		JButton btnNewButton = new JButton("\uD640");
 		btnNewButton.setBackground(new Color(224, 255, 255));
@@ -225,11 +201,11 @@ public class GameRoomAttackFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// 서버에 "홀"을 전송
-				
+
 				// 상대방이 고르기를 기다림
-				
+
 				if (oppMessage == "짝") {
-				// 상대방이 짝을 골랐으면
+					// 상대방이 짝을 골랐으면
 					JOptionPane.showMessageDialog(null, "공격 성공!");
 					win++;
 				}
@@ -237,13 +213,13 @@ public class GameRoomAttackFrame {
 					JOptionPane.showMessageDialog(null, "공격 실패!");
 					lose++;
 				}
-					
+
 			}
 		});
 		btnNewButton.setBounds(10, 271, 241, 152);
-		frame.getContentPane().add(btnNewButton);
+		add(btnNewButton);
 
-		
+
 		// 공격이 짝을 눌렀을 때
 		JButton btnNewButton_1 = new JButton("\uC9DD");
 		btnNewButton_1.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 60));
@@ -253,9 +229,9 @@ public class GameRoomAttackFrame {
 			public void actionPerformed(ActionEvent e1) {
 				if (oppMessage == "홀") {
 					// 서버에 "홀"을 전송
-					
+
 					// 상대방이 고르기를 기다림
-					
+
 					JOptionPane.showMessageDialog(null, "공격 성공!");
 				}
 				else {
@@ -263,44 +239,44 @@ public class GameRoomAttackFrame {
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_1);
-		
+		add(btnNewButton_1);
+
 		textField = new JTextField();
 		textField.setBounds(10, 228, 290, 31);
-		frame.getContentPane().add(textField);
+		add(textField);
 		textField.setColumns(10);
-		
+
 		JButton btnNewButton_2 = new JButton("Send");
 		btnNewButton_2.setBackground(new Color(230, 230, 250));
 		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
 		btnNewButton_2.setBounds(298, 228, 52, 31);
-		frame.getContentPane().add(btnNewButton_2);
+		add(btnNewButton_2);
 	}
-	
+
 	private void sendReady() {
 		try {
 			out.writeUTF("ready");
 		} catch (Exception e) {
 		}
-		
+
 	}
-	
+
 	static class ClientReceiver extends Thread {
 		Socket socket;
 		DataInputStream in;
-		
+
 		ClientReceiver(Socket socket) {
 			this.socket = socket;
 			try {
 				in = new DataInputStream(socket.getInputStream());
 			} catch(IOException e) {}
 		}
-		
+
 		public void run() {
 			while (in != null) {
 				try {
 					String query = in.readUTF();
-					
+
 					if (query.equals("chating in")) {
 						display.append(in.readUTF());
 						tfChat.selectAll();
@@ -325,5 +301,5 @@ public class GameRoomAttackFrame {
 		}
 	}
 
-	
+
 }
