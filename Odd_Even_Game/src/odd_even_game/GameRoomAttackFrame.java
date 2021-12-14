@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
@@ -41,16 +42,25 @@ public class GameRoomAttackFrame {
 	JButton sendBtn;
 	JPanel inputPane;
 	
-	String nick = null;
+	static String nick = null;
 	int win;
 	int lose;
 	
 	private JFrame frame;
 	private JTextField textField;
 	
-	Socket socket = null;
-	DataOutputStream out;
-	DataInputStream in;
+	static Socket socket = null;
+	static DataOutputStream out;
+	static DataInputStream in;
+	public boolean isClickReadyBtn = false;
+	public boolean isStart = false;
+	public boolean isEnd = false;
+	public boolean isRightAnswer = false;
+	public int checkReady = 0; // 입장 인원 중 몇 명이 준비 버튼을 눌렀는지 담는 변수
+	public int userTurn = 0; // 접속하는 클라이언트에게 턴을 부여해주는 변수
+	public int selectTurn = 1; // 누가 턴인지 정하는 변수
+	public String clientID; // 클라이언트 아이디를 담는 변수
+	
 
 	/**
 	 * Launch the application.
@@ -59,7 +69,7 @@ public class GameRoomAttackFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					GameRoomAttackFrame window = new GameRoomAttackFrame();
+					GameRoomAttackFrame window = new GameRoomAttackFrame(socket, nick);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -74,13 +84,19 @@ public class GameRoomAttackFrame {
 	 * Create the application.
 	 */
 	public GameRoomAttackFrame(Socket socket, final String nickName) {
-		initialize(socket, nickName);
+		try {
+			initialize(socket, nickName);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws IOException 
 	 */
-	private void initialize(Socket socket, final String nickName) {
+	private void initialize(Socket socket, final String nickName) throws IOException {
 		frame = new JFrame();
 		frame.setTitle("홀짝게임 스타트! - 공격");
 		frame.setSize(523, 460);
@@ -181,11 +197,24 @@ public class GameRoomAttackFrame {
 			}
 		});
 		
-		// 둘 다 준비 완료가 되면
-		if (user1.ready == 1 && user2.ready == 2) {
-		 // 버튼 사라짐
+		String response = "";
+		while(!response.equals("ready") && !response.equals("no")) {
+			response = in.readUTF();
+			System.out.println(response);
+		}
+		
+		if(response.equals("ready")) {
 			readyButton.setVisible(false);
 		}
+		else if(response.equals("no")) {
+			JOptionPane.showMessageDialog(null, "아직 준비 완료가 되지 않았나봅니다!", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
+		}
+
+//		// 둘 다 준비 완료가 되면
+//		if (user1.ready == 1 && user2.ready == 2) {
+//		 // 버튼 사라짐
+//			readyButton.setVisible(false);
+//		}
 		
 		final String oppMessage = "홀";
 		
@@ -236,16 +265,24 @@ public class GameRoomAttackFrame {
 		});
 		frame.getContentPane().add(btnNewButton_1);
 		
-//		textField = new JTextField();
-//		textField.setBounds(10, 228, 290, 31);
-//		frame.getContentPane().add(textField);
-//		textField.setColumns(10);
-//		
-//		JButton btnNewButton_2 = new JButton("Send");
-//		btnNewButton_2.setBackground(new Color(230, 230, 250));
-//		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
-//		btnNewButton_2.setBounds(298, 228, 52, 31);
-//		frame.getContentPane().add(btnNewButton_2);
+		textField = new JTextField();
+		textField.setBounds(10, 228, 290, 31);
+		frame.getContentPane().add(textField);
+		textField.setColumns(10);
+		
+		JButton btnNewButton_2 = new JButton("Send");
+		btnNewButton_2.setBackground(new Color(230, 230, 250));
+		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
+		btnNewButton_2.setBounds(298, 228, 52, 31);
+		frame.getContentPane().add(btnNewButton_2);
+	}
+	
+	private void sendReady() {
+		try {
+			out.writeUTF("ready");
+		} catch (Exception e) {
+		}
+		
 	}
 	
 	static class ClientReceiver extends Thread {
@@ -269,12 +306,24 @@ public class GameRoomAttackFrame {
 						tfChat.selectAll();
 					}
 					else if (query.equals("ready")) {
-						
+						int result = JOptionPane.showConfirmDialog(null, "상대방 준비 완료! 게임을 시작하시겠습니까?", "준비", JOptionPane.YES_NO_OPTION);
+						if (result == JOptionPane.CLOSED_OPTION) {
+							// 사용자가 "예", "아니오"의 선택 없이 다이얼로그 창을 닫은 경우
+							out.writeUTF("no");
+						}
+						else if (result == JOptionPane.YES_OPTION) {
+							// 예
+							out.writeUTF("ready");
+						}
+						else {
+							// 아니오
+							out.writeUTF("no");
+						}
 					}
-				}
+				} catch (IOException e) {}
 			}
 		}
 	}
-	
+
 	
 }
