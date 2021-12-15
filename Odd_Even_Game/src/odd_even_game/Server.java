@@ -10,9 +10,9 @@ public class Server {
 	Database db = new Database();
 	RoomManager roomManger;
    
-   static HashMap<String, Object> loginList;
-   static HashMap<String, Object> waitingList;   // ���ǿ� waiting List
-   static ArrayList<GameUser> GamersList;      // user outputStream ��Ƴ��� hashMap
+   static HashMap<String, Object> loginList;		// login list
+   static HashMap<String, Object> waitingList;   // waiting List
+   static ArrayList<GameUser> GamersList;      // user outputStream who is gaming hashMap
    
    
    Server() {
@@ -30,7 +30,7 @@ public class Server {
       int nPort = 21118;
       
       try {
-         welcomeSocket = new ServerSocket(nPort);
+         welcomeSocket = new ServerSocket(nPort);		// welcome socket
          System.out.println("Server start");
          
          while(true) {
@@ -45,7 +45,7 @@ public class Server {
       }
    }
       
-   void sendToAll(String msg) {
+   void sendToAll(String msg) {		// send all users in waiting room
       Iterator<String> it = waitingList.keySet().iterator();
       
       while(it.hasNext()) {
@@ -58,7 +58,7 @@ public class Server {
    }
    
    
-   boolean sendRequestGame(String myNickName, String oppNickName) {
+   boolean sendRequestGame(String myNickName, String oppNickName) {		// send battle request to one user
 	      try {
 	    	  DataOutputStream sendout = (DataOutputStream)waitingList.get(oppNickName);
 	    	  
@@ -75,7 +75,7 @@ public class Server {
 	      return false;
    }
    
-   void sendToGameRoom(String msg, GameRoom room) {
+   void sendToGameRoom(String msg, GameRoom room) {		// send 1 : 1 message in game room in ready state
       try {
          DataOutputStream sendout1 = (DataOutputStream)room.user1.out;
          DataOutputStream sendout2 = (DataOutputStream)room.user2.out;
@@ -86,21 +86,21 @@ public class Server {
       } catch(IOException e) {}
    }
    
-   void sendTo1(String msg, GameRoom room) {
+   void sendTo1(String msg, GameRoom room) {		// send to user1 in game room
 	      try {
 	         DataOutputStream sendout1 = (DataOutputStream)room.user1.out;
 	         sendout1.writeUTF(msg);
 	      } catch(IOException e) {}
 	   }
    
-   void sendTo2(String msg, GameRoom room) {
+   void sendTo2(String msg, GameRoom room) {		// send to user2 in game room
 	      try {
 	         DataOutputStream sendout2 = (DataOutputStream)room.user2.out;
 	         sendout2.writeUTF(msg);
 	      } catch(IOException e) {}
 	   }
    
-   boolean checkResult(GameRoom room) {
+   boolean checkResult(GameRoom room) {			// check odd_even game's result
 	   if(room.ans.equals("odd"))
 		   room.odd_even = 1;
 	   else if (room.ans.equals("even"))
@@ -112,24 +112,21 @@ public class Server {
 		   return false;
    }
    
-   void update_waitingList() {
+   void update_waitingList() {		// update waiting list in waiting room when someone come or leave
 	   Iterator<String> it = waitingList.keySet().iterator();
 	   String info = "";
 	   while(it.hasNext()) {
 	      String nickName = it.next();
 	      info = db.getUserInfo(nickName);
-	      
-	      
-	      // 테이블 업데이트 info를 parameter로 넘겨줌
 	   }
    }
    
 
-   public static void main(String[] args) {
+   public static void main(String[] args) {s
       new Server().start();
    }
    
-   class ServerReceiver extends Thread{   // Server Receiver �������� ä�� �޴� ��
+   class ServerReceiver extends Thread{   // Server Receiver
       Socket socket;
       DataInputStream in;
       DataOutputStream out;
@@ -157,11 +154,11 @@ public class Server {
             while(in != null) {
             	String query = in.readUTF();
             	
-            	LocalDateTime today = LocalDateTime.now(); // ���� ��¥
-        		String todayString = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")); // ���� ��¥ �˻� ���ǿ� �°� ����
+            	LocalDateTime today = LocalDateTime.now(); // today in localdatetime type
+        		String todayString = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")); // today time in string type
             	
             	if (loginList.get(name) != null) {
-            		if(query.equals("login")) {
+            		if(query.equals("login")) {		// login
             			String id = in.readUTF();
                     	String password = in.readUTF();
                     	
@@ -178,7 +175,7 @@ public class Server {
                     	else
                     		out.writeUTF("Fail");
             		}
-            		else {
+            		else {		// join
             			String id = in.readUTF();
                     	String password = in.readUTF();
                     	name = in.readUTF();
@@ -186,12 +183,12 @@ public class Server {
                     	String email = in.readUTF();
                     	String sns = in.readUTF();
                     	
-                    	if(db.addUser(id, password, name, nickName, email, sns, socket.getInetAddress(), todayString)){
+                    	if(db.addUser(id, password, name, nickName, email, sns, socket.getInetAddress(), todayString)){		// add user in user database
                     		System.out.println(id + " : join complete!");
                     		out.writeUTF("Success");
                     	}
                     	else {
-                    		System.out.println(id + " : join failed!");
+                    		System.out.println(id + " : join failed!");		// join failed because of redundant id
                     		out.writeUTF("Fail");
                     	}
             		}
@@ -199,14 +196,14 @@ public class Server {
             	
             	else if (waitingList.get(name) != null) {
             		
-            		if(query.equals("memberInfo")) {
+            		if(query.equals("memberInfo")) {		// check users information
             			String nickName = in.readUTF();
             			String info = db.getUserInfo(nickName);
             			
             			out.writeUTF("memberInfo res");
             			out.writeUTF(info);
             		}
-            		else if (query.equals("battleRequest")) {
+            		else if (query.equals("battleRequest")) {		// receive battle request
             			System.out.println("battleRequest");
             			String oppNickName = in.readUTF();
             			if(!sendRequestGame(name, oppNickName))
@@ -214,7 +211,7 @@ public class Server {
             			out.writeUTF(oppNickName);
             		}
             		
-            		else if(query.equals("yes")) {
+            		else if(query.equals("yes")) {		// receive yes answer for battle request
             			String oppNickName = in.readUTF();
             			
             			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
@@ -234,24 +231,22 @@ public class Server {
             			oppSocket = user2.socket;
             		}
             		
-            		else if(query.equals("no")) {
+            		else if(query.equals("no")) {		// receive no answer for battle request
             			String oppNickName = in.readUTF();
             			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
             			resout.writeUTF("rejected");
             			resout.writeUTF(oppNickName);
             		}
             		
-            		else if (query.equals("chat")) {
+            		else if (query.equals("chat")) {		// want to chat in waiting room
             			sendToAll(in.readUTF());
             		}
             	}
             	
             	else {
-            		System.out.println(name + query);
-            		
             		int gameRoomNum = 0;
             		
-            		for(int i=0; i < RoomManager.roomList.size(); i++) {
+            		for(int i=0; i < RoomManager.roomList.size(); i++) {		// find game room that the user is in
             			if (RoomManager.roomList.get(i).user1.nickName.equals(name) ||
             					RoomManager.roomList.get(i).user2.nickName.equals(name)) {
             				gameRoomNum = i;
@@ -259,29 +254,28 @@ public class Server {
             			}
             		}
             		
-            		if(query.equals("11 chat")) {
+            		if(query.equals("11 chat")) {		// want to 1:1 chat in game room in ready state
             			String msg = in.readUTF();
             			sendToGameRoom("game chating in", RoomManager.roomList.get(gameRoomNum));
             			sendToGameRoom(msg, RoomManager.roomList.get(gameRoomNum));
             		}
             		
-            		else if(query.equals("ready")) {
+            		else if(query.equals("ready")) {		// ready for this game
             			RoomManager.roomList.get(gameRoomNum).ready ++;
             			if(RoomManager.roomList.get(gameRoomNum).checkAllReady()) {
             				sendTo1("defence", RoomManager.roomList.get(gameRoomNum));
             			}
             		}
             		
-            		else if (query.equals("how many")) {
+            		else if (query.equals("how many")) {		// set marbles for defence
             			RoomManager.roomList.get(gameRoomNum).number = Integer.parseInt(in.readUTF());
         				sendTo2("attack", RoomManager.roomList.get(gameRoomNum));
             		}
             		
-            		else if (query.equals("ans is")) {
+            		else if (query.equals("ans is")) {		// guess odd or even for attack
             			RoomManager.roomList.get(gameRoomNum).ans = in.readUTF();
             			
-            			System.out.println(RoomManager.roomList.get(gameRoomNum).number + RoomManager.roomList.get(gameRoomNum).ans);
-            			if(checkResult(RoomManager.roomList.get(gameRoomNum))){
+            			if(checkResult(RoomManager.roomList.get(gameRoomNum))){			// check result and alert who is winner
             				sendTo2("you win", RoomManager.roomList.get(gameRoomNum));
             				sendTo1("you lose", RoomManager.roomList.get(gameRoomNum));
             				
@@ -297,7 +291,7 @@ public class Server {
             			}
             		}
             		
-            		else if (query.equals("go to waiting room")) {
+            		else if (query.equals("go to waiting room")) {		// go back to waiting room
             			RoomManager.RemoveRoom(RoomManager.roomList.get(gameRoomNum));
             		}
             		
@@ -316,14 +310,14 @@ public class Server {
       }
    }
    
-   public static class RoomManager {
+   public static class RoomManager {		// manage for multiroom structure
       static List<GameRoom> roomList;
       
       RoomManager(){
          roomList = new ArrayList<GameRoom>();
       }
       
-      GameRoom CreateRoom(GameUser user1, GameUser user2) {
+      GameRoom CreateRoom(GameUser user1, GameUser user2) {		// create game room
          GameRoom room = new GameRoom(user1, user2);
          roomList.add(room);
          
@@ -335,7 +329,7 @@ public class Server {
          return room;
       }
       
-      public static void RemoveRoom(GameRoom room) {
+      public static void RemoveRoom(GameRoom room) {		// remove game room
          waitingList.put(room.user1.nickName, room.user1.socket);
          waitingList.put(room.user2.nickName, room.user2.socket);
          roomList.remove(room);
@@ -344,7 +338,7 @@ public class Server {
          System.out.println("The current number of server users : " + waitingList.size());
       }
       
-      public int RoomCount(){
+      public int RoomCount(){		// return number of game room that is running
          return roomList.size();
       }
    }

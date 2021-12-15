@@ -19,24 +19,19 @@ public class GameRoom {
 	public GameRoom(GameUser user1, GameUser user2) {
 		this.user1 = user1;
 		this.user2 = user2;
-		
-//		try {
-//			user1.out.writeUTF("Welcome");
-//			user2.out.writeUTF("Welcome");
-//		} catch (IOException e) {}
 	}
 	
 	public void ExitGame(GameUser user) {	//Exit game
 		Server.RoomManager.RemoveRoom(this);
 	}
 	
-	public boolean checkAllReady() {
+	public boolean checkAllReady() {	// check all ready
 		if(ready == 2)
 			return true;
 		return false;
 	}
 	
-	public void whoWin() {
+	public void whoWin() {		// check who is winner
 		if(ans.equals("odd"))
 			odd_even = 1;
 		else if (ans.equals("even"))

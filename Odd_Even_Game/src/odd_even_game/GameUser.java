@@ -22,7 +22,7 @@ public class GameUser {
 		this.nickName = nickName;
 	}
 	
-	public GameUser(String nickName, DataOutputStream dataOutputStream) {
+	public GameUser(String nickName, DataOutputStream dataOutputStream) {		// set game user's dataoutput stream
 		this.nickName = nickName;
 		
 		try {

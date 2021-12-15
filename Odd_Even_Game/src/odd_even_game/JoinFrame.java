@@ -101,7 +101,7 @@ public class JoinFrame extends JFrame {
       tfSNS.setBounds(159, 306, 186, 30);
       contentPane.add(tfSNS);      
       
-      joinCompleteBtn = new JButton("Join Complete");
+      joinCompleteBtn = new JButton("Join Complete");		// join button
       joinCompleteBtn.setBounds(206, 356, 139, 29);
       contentPane.add(joinCompleteBtn);
       
@@ -135,10 +135,10 @@ public class JoinFrame extends JFrame {
                out.writeUTF(email);
                out.writeUTF(sns);
                
-               if(in.readUTF().equals("Success")) {
+               if(in.readUTF().equals("Success")) {		// join success
             	   JOptionPane.showMessageDialog(null, "Welcome!");
                }
-               else {
+               else {		// redundant id or network error
             	   JOptionPane.showMessageDialog(null, "join failed");
                }
             } catch (IOException e1) {}

@@ -87,7 +87,7 @@ public class GameRoomAttackFrame extends JFrame{
 
 
 		tfChat = new JTextField(25);
-		final JButton sendBtn = new JButton("send");
+		final JButton sendBtn = new JButton("send");	// send button for chatting
 		sendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -138,7 +138,7 @@ public class GameRoomAttackFrame extends JFrame{
 		panel_2.setBounds(360, 137, 147, 123);
 		add(panel_2);
 
-		final JLabel lblNewLabel = new JLabel("상대 정보");
+		final JLabel lblNewLabel = new JLabel("상대 정보");	// opp player information
 		final JLabel lblenemy = new JLabel("Nickname: nickname2");
 		final JLabel lblenemywin = new JLabel("Win: 1");
 		final JLabel lblenemylose = new JLabel("Lose: 0");
@@ -146,7 +146,7 @@ public class GameRoomAttackFrame extends JFrame{
 		panel_1.add(lblenemy);
 		panel_1.add(lblenemywin);
 		panel_1.add(lblenemylose);
-		final JLabel lblNewLabel2 = new JLabel("내 정보");
+		final JLabel lblNewLabel2 = new JLabel("내 정보");	// my information
 		panel_2.add(lblNewLabel2);
 		final JLabel lblme = new JLabel("Nickname: nickname1");
 		final JLabel lblmewin = new JLabel("Win: 5");
@@ -156,12 +156,12 @@ public class GameRoomAttackFrame extends JFrame{
 		panel_2.add(lblmelose);
 		
 
-		final JButton readyButton = new JButton("준비 완료!");
+		final JButton readyButton = new JButton("준비 완료!");		// ready button
 		readyButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 30));
 		readyButton.setBackground(new Color(200, 200, 255));
 		readyButton.setBounds(10, 270, 250, 155);
 		
-		final JButton WaitingRoomButton = new JButton("대기실로!");
+		final JButton WaitingRoomButton = new JButton("대기실로!");	// exit button : go back to waiting room
 		WaitingRoomButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 30));
 		WaitingRoomButton.setBackground(new Color(200, 255, 200));
 		WaitingRoomButton.setBounds(265, 270, 247, 155);
@@ -169,9 +169,8 @@ public class GameRoomAttackFrame extends JFrame{
 		add(readyButton);
 		add(WaitingRoomButton);
 
-		readyButton.addActionListener(new ActionListener() {
+		readyButton.addActionListener(new ActionListener() {	// button action : make all attribute invisible
 			public void actionPerformed(ActionEvent e1) {
-				// 버튼 누르면 서버에게 준비 완료되었음을 전송
 				try {
 					out.writeUTF("ready");
 					readyButton.setVisible(false);
@@ -194,7 +193,7 @@ public class GameRoomAttackFrame extends JFrame{
 			}
 		});
 		
-		WaitingRoomButton.addActionListener(new ActionListener() {
+		WaitingRoomButton.addActionListener(new ActionListener() {		// go back to waiting room
 			public void actionPerformed(ActionEvent e1) {
 				try {
 					out.writeUTF("go to waiting room");
@@ -207,7 +206,7 @@ public class GameRoomAttackFrame extends JFrame{
 	
 	
 
-	static class ClientReceiver extends Thread {
+	static class ClientReceiver extends Thread {	// receive instruction from server
 		Socket socket;
 		DataInputStream in;
 
@@ -223,17 +222,17 @@ public class GameRoomAttackFrame extends JFrame{
 				try {
 					String query = in.readUTF();
 
-					if (query.equals("game chating in")) {
+					if (query.equals("game chating in")) {		// update display for chatting
 						display.append(in.readUTF());
 						tfChat.selectAll();
 					}
 					
-					else if (query.equals("defence")) {
+					else if (query.equals("defence")) {		// set number of marbles
 						String num = JOptionPane.showInputDialog("구슬 몇 개 내시겠습니까 ?");
 						out.writeUTF("how many");
 						out.writeUTF(num);
 					}
-					else if (query.equals("attack")) {
+					else if (query.equals("attack")) {		// guess odd or even
 						int YorN = JOptionPane.showConfirmDialog(null, "홀 ? 짝 ?", " 공 격 ", JOptionPane.YES_NO_OPTION);
                         
 						out.writeUTF("ans is");
@@ -243,11 +242,11 @@ public class GameRoomAttackFrame extends JFrame{
                         	out.writeUTF("even");
 					}
 					
-					else if (query.equals("you win")) {
+					else if (query.equals("you win")) {		// alert that you won
 						String result = "승리";
 						JOptionPane.showMessageDialog(null, result, " 승 리 ", JOptionPane.PLAIN_MESSAGE);
 					}
-					else if (query.equals("you lose")) {
+					else if (query.equals("you lose")) {		// alert that you lose
 						String result = "패배";
 						JOptionPane.showMessageDialog(null, result, " 패 배 ", JOptionPane.PLAIN_MESSAGE);
 					}

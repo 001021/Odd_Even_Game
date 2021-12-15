@@ -73,8 +73,6 @@ public class WaitRoomFrame extends JFrame{
 		Object[][] tableData = { {"nickname1: 5승 8패"}, 
 				{"nickname2: 1승 0패"}
 		};
-	
-
 		
 		model2 = new DefaultTableModel(tableData, col2);
 
@@ -93,7 +91,7 @@ public class WaitRoomFrame extends JFrame{
 		inputPane = new JPanel();
 
 		tfChat = new JTextField(25);
-		JButton sendBtn = new JButton("send");
+		JButton sendBtn = new JButton("send");		// send button for chatting
 
 		sendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -128,11 +126,11 @@ public class WaitRoomFrame extends JFrame{
 
 
 		JPanel p2 = new JPanel();
-		b3 = new JButton("1:1 신청");
-		b5 = new JButton("View info");
-		b6 = new JButton("Exit");
+		b3 = new JButton("1:1 신청");		// battle request
+		b5 = new JButton("View info");		// view user's information
+		b6 = new JButton("Exit");		// quit this waiting room
 
-		b3.addActionListener(new ActionListener() {
+		b3.addActionListener(new ActionListener() {		// b3 battle request
 			@Override
 			public void actionPerformed(ActionEvent e1) {
 				String oppID;
@@ -150,7 +148,7 @@ public class WaitRoomFrame extends JFrame{
 
 
 
-		b5.addActionListener(new ActionListener() {
+		b5.addActionListener(new ActionListener() {		// b5 view user's information
 			@Override
 			public void actionPerformed(ActionEvent e2) {
 				try {
@@ -227,46 +225,42 @@ public class WaitRoomFrame extends JFrame{
 				try {
 					String query = in.readUTF();
 
-					if(query.equals("chating in")) {
+					if(query.equals("chating in")) {	// update display for chatting
 						display.append(in.readUTF());
 						tfChat.selectAll();
 					}
-					else if (query.equals("battleRequest from others")) { // *************************************************************************
+					else if (query.equals("battleRequest from others")) { // receive battle request from another user
 						String oppNickName = in.readUTF();
-
-						// 상대방에게 가는 메시지
-						// confirm dialog의 리턴값 : YES == 0 NO == 1 X == -1 (팝업 종료)
+						
 						int YorN = JOptionPane.showConfirmDialog(null, oppNickName + "님으로부터 대결 신청!\n수락하시겠습니까?", " 대 결 신 청", JOptionPane.YES_NO_OPTION);
 
-						if (YorN == 0) {
+						if (YorN == 0) {		// accept
 							out.writeUTF("yes");
 							out.writeUTF(oppNickName);
 						}
 
-						else {
-							// 상대방에게 가는 메세지
+						else {		// refuse
 							JOptionPane.showMessageDialog(null, oppNickName + "님과의 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
-							// 나에게 오는 메세지
 							out.writeUTF("no");
 							out.writeUTF(oppNickName);
 						}
 					}
 
-					if(query.equals("game start")) {
+					if(query.equals("game start")) {		// game start
 						JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", "[" + nickName + "] 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
 						new GameRoomAttackFrame(socket, nickName);
 					}
-					else if(query.equals("rejected")) {
+					else if(query.equals("rejected")) {		// rejected
 						String oppNickName = in.readUTF();
 						JOptionPane.showMessageDialog(null, oppNickName + "님께서 대결을 거절하셨습니다...", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
 					}
 
-					else if(query.equals("Error : write correct nickname")) {
+					else if(query.equals("Error : write correct nickname")) {		// wrote incorrect nickname in user database
 						String oppNickName = in.readUTF();
 						JOptionPane.showMessageDialog(null, oppNickName + "님을 찾을 수 없습니다...", " 검 색 실 패", JOptionPane.PLAIN_MESSAGE);
 					}
 
-					else if(query.equals("memberInfo res")) {
+					else if(query.equals("memberInfo res")) {		// receive user's information that is requested
 						String info = in.readUTF();
 						JOptionPane.showMessageDialog(null, info, "정 보 보 기", JOptionPane.PLAIN_MESSAGE);
 					}

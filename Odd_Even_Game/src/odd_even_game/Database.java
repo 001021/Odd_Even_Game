@@ -15,7 +15,7 @@ public class Database {
          BufferedReader br = new BufferedReader(fr);
          
          while((line=br.readLine())!=null){ 	//Read the file until there's an empty space
-            array=line.split("\\*");
+            array=line.split("&");
             if(id.equals(array[0]) || nickName.equals(array[3])) {
                return true;
             }
@@ -44,7 +44,7 @@ public class Database {
        
        try {
           BufferedWriter bw = new BufferedWriter(new FileWriter("userDB.txt",true));
-          bw.write(id+"\\*"+password+"\\*"+name+"\\*"+nickName+"\\*"+email+"\\*"+sns+"\\*"+inetAddress+"\\*"+time+"/1/0/0"+"\n");
+          bw.write(id+"&"+password+"&"+name+"&"+nickName+"&"+email+"&"+sns+"&"+inetAddress+"&"+time+"/1/0/0"+"\n");
           bw.close();	//file update
        }catch(IOException e) {
           System.out.println(e);
@@ -68,7 +68,7 @@ public class Database {
           BufferedReader br = new BufferedReader(fr);
           
           while((line=br.readLine())!=null){
-             array=line.split("\\*");
+             array=line.split("&");
              if(id.equals(array[0])) {
                 if(password.equals(array[1])) {
                    System.out.println("로그인 성공");
@@ -100,9 +100,9 @@ public class Database {
           BufferedReader br = new BufferedReader(fr);
           
           while((line=br.readLine())!=null){
-             array=line.split("\\*");
+             array=line.split("&");
                if(nickName.equals(array[3])==true) {
-            	   result = nickName + " : " +array[10]+"승 "+array[11]+"패";
+            	   result = nickName + " : " +array[9]+"승 "+array[10]+"패";
                   return result;
                }
           }
@@ -124,11 +124,11 @@ public class Database {
             String temp = "";
             
             while((line = br.readLine()) != null) {
-             array=line.split("\\*");
+             array=line.split("&");
                if(nickName.equals(array[3])) {
                 int win=Integer.parseInt(array[9])+1;
                 array[9]=Integer.toString(win);
-                temp += array[0]+"\\*"+array[1]+"\\*"+array[2]+"\\*"+array[3]+"\\*"+array[4]+"\\*"+array[5]+"\\*"+array[6]+"\\*"+array[7]+"\\*"+array[8]+"\\*"+array[9]+"\\*"+array[10]+"\n";
+                temp += array[0]+"&"+array[1]+"&"+array[2]+"&"+array[3]+"&"+array[4]+"&"+array[5]+"&"+array[6]+"&"+array[7]+"&"+array[8]+"&"+array[9]+"&"+array[10]+"\n";
                 continue;
                 }
                temp += line+"\n";
@@ -155,11 +155,11 @@ public class Database {
          String temp = "";
          
          while((line = br.readLine()) != null) {
-          array=line.split("\\*");
+          array=line.split("&");
             if(nickName.equals(array[3])) {
              int lose=Integer.parseInt(array[10])+1;
              array[10]=Integer.toString(lose);
-             temp += array[0]+"\\*"+array[1]+"\\*"+array[2]+"\\*"+array[3]+"\\*"+array[4]+"\\*"+array[5]+"\\*"+array[6]+"\\*"+array[7]+"\\*"+array[8]+"\\*"+array[9]+"\\*"+array[10]+"\n";
+             temp += array[0]+"&"+array[1]+"&"+array[2]+"&"+array[3]+"&"+array[4]+"&"+array[5]+"&"+array[6]+"&"+array[7]+"&"+array[8]+"&"+array[9]+"&"+array[10]+"\n";
              continue;
              }
             temp += line+"\n";
@@ -185,13 +185,13 @@ public class Database {
              String temp = "";
              
              while((line = br.readLine()) != null) {
-              array=line.split("\\*");
+              array=line.split("&");
                 if(nickName.equals(array[3])) {
                 	array[6] = String.valueOf(inetAddress);
                  array[7]=time;
                  int count=Integer.parseInt(array[8])+1;
                 array[8]=Integer.toString(count);
-                 temp += array[0]+"\\*"+array[1]+"\\*"+array[2]+"\\*"+array[3]+"\\*"+array[4]+"\\*"+array[5]+"\\*"+array[6]+"\\*"+array[7]+"\\*"+array[8]+"\\*"+array[9]+"\\*"+array[10]+"\n";
+                 temp += array[0]+"&"+array[1]+"&"+array[2]+"&"+array[3]+"&"+array[4]+"&"+array[5]+"&"+array[6]+"&"+array[7]+"&"+array[8]+"&"+array[9]+"&"+array[10]+"\n";
                  continue;
                  }
                 temp += line+"\n";
@@ -219,7 +219,7 @@ public class Database {
           BufferedReader br = new BufferedReader(fr);
            
           while((line=br.readLine())!=null){
-             array=line.split("\\*");
+             array=line.split("&");
              if(id.equals(array[0])==true) {
                 result=array[3];
                 return result;

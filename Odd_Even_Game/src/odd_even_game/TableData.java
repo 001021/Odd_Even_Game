@@ -5,7 +5,7 @@ public class TableData {
 	private String nickName;
 	private int record;
 	
-	public TableData(String ID, String nickName, int record) {
+	public TableData(String ID, String nickName, int record) {		// table for waiting list in waiting room
 		super();
 		this.ID = ID;
 		this.nickName = nickName;

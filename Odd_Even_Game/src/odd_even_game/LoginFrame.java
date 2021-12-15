@@ -70,7 +70,7 @@ public class LoginFrame extends JFrame {
       
 
       // Login Button action
-      logBtn.addActionListener(new ActionListener() {
+      logBtn.addActionListener(new ActionListener() {		// login button
          @Override
          public void actionPerformed(ActionEvent e2) {
             String id = txtID.getText();
@@ -87,11 +87,11 @@ public class LoginFrame extends JFrame {
                 	String nickName = in.readUTF();
                 	JOptionPane.showMessageDialog(null, "게임 한 판 할까요!");
                 	// User가 로그인 했을 때 뜨는 창으로 연결
-                	new WaitRoomFrame(socket, nickName);
+                	new WaitRoomFrame(socket, nickName);		// call waiting room
                 	dispose();
                 }
                 else {
-                	JOptionPane.showMessageDialog(null, "로그인 실패");
+                	JOptionPane.showMessageDialog(null, "로그인 실패");		// invalid id or password
                 }
 			} catch (IOException e) {}
          }
