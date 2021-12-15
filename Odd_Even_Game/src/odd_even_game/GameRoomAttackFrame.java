@@ -183,6 +183,9 @@ public class GameRoomAttackFrame extends JFrame{
 		
 		WaitingRoomButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
+				try {
+					out.writeUTF("go to waiting room");
+				} catch (IOException e) {}
 				// 버튼 누르면 대기실로
 				dispose();
 			}

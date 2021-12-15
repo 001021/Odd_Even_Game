@@ -73,24 +73,7 @@ public class WaitRoomFrame extends JFrame{
 		Object[][] tableData = { {"Nickname: 0승 0패"}, 
 				{"djWjrh: dp승 dp패"}
 		};
-		
-//		Set<String> keyList = server.waitingList.keySet();
-//		Iterator<String> itr = keyList.iterator();
-//		int index = 0;
-//		while (itr.hasNext()) {
-//			String name = itr.next();
-//			ID[index] = server.waitingList.get(ID);
-//			Nickname[index] = server.waitingList.get(nickName);
-//			Record[index] = server.waitingList.get(Record);
-//			index++;
-//		}
-//		
-//		for (int i = 0 ; i < index; i++) {
-//			tableData[i][0] = ID[i];
-//			tableData[i][1] = Nickname[i];
-//			tableData[i][2] = Record[i];
-//		}
-		
+	
 
 		
 		model2 = new DefaultTableModel(tableData, col2);
