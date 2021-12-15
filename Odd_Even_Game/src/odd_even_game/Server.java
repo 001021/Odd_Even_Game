@@ -57,6 +57,7 @@ public class Server {
       }
    }
    
+   
    boolean sendRequestGame(String myNickName, String oppNickName) {
 	      try {
 	    	  DataOutputStream sendout = (DataOutputStream)waitingList.get(oppNickName);
@@ -76,27 +77,53 @@ public class Server {
    
    void sendToGameRoom(String msg, GameRoom room) {
       try {
-         DataOutputStream sendout1 = (DataOutputStream)room.userList.get(0).out;
-         sendout1.writeUTF("game chating in");
-         sendout1.writeUTF(msg);
+         DataOutputStream sendout1 = (DataOutputStream)room.user1.out;
+         DataOutputStream sendout2 = (DataOutputStream)room.user2.out;
          
-         DataOutputStream sendout2 = (DataOutputStream)room.userList.get(1).out;
-         sendout2.writeUTF("game chating in");
+         sendout1.writeUTF(msg);
          sendout2.writeUTF(msg);
          
       } catch(IOException e) {}
    }
    
-   void GameRoomAllReady(GameRoom room) {
+   void sendTo1(String msg, GameRoom room) {
 	      try {
-	         DataOutputStream sendout1 = (DataOutputStream)room.userList.get(0).out;
-	         sendout1.writeUTF("all ready");
-	         
-	         DataOutputStream sendout2 = (DataOutputStream)room.userList.get(1).out;
-	         sendout2.writeUTF("all ready");
-	         
+	         DataOutputStream sendout1 = (DataOutputStream)room.user1.out;
+	         sendout1.writeUTF(msg);
 	      } catch(IOException e) {}
 	   }
+   
+   void sendTo2(String msg, GameRoom room) {
+	      try {
+	         DataOutputStream sendout2 = (DataOutputStream)room.user2.out;
+	         sendout2.writeUTF(msg);
+	      } catch(IOException e) {}
+	   }
+   
+   void sendResult(GameRoom room) {
+	   if(room.ans.equals("odd"))
+		   room.odd_even = 1;
+	   else if (room.ans.equals("even"))
+		   room.odd_even = 0;
+	
+	try {
+		DataOutputStream sendout1 = (DataOutputStream)room.user1.out;
+		DataOutputStream sendout2 = (DataOutputStream)room.user2.out;
+        
+		if(room.number % 2 == room.odd_even) {
+			System.out.println("correct");
+			sendout2.writeUTF("you win");
+			sendout1.writeUTF("you lose");
+		 }
+		 else {
+			 System.out.println("incorrect");
+			 sendout1.writeUTF("you win");
+			 sendout2.writeUTF("you lose");
+		 }
+	}
+	catch(Exception e) {}
+   }
+   
 
    public static void main(String[] args) {
       new Server().start();
@@ -107,6 +134,7 @@ public class Server {
       DataInputStream in;
       DataOutputStream out;
       private String myNickName;
+      Socket oppSocket;
       
       ServerReceiver(Socket socket){
          this.socket = socket;
@@ -128,9 +156,9 @@ public class Server {
             
             
             while(in != null) {
+            	String query = in.readUTF();
+            	
             	if (loginList.get(name) != null) {
-            		String query = in.readUTF();
-            		
             		if(query.equals("login")) {
             			String id = in.readUTF();
                     	String password = in.readUTF();
@@ -168,7 +196,6 @@ public class Server {
                 }
             	
             	else if (waitingList.get(name) != null) {
-            		String query = in.readUTF();
             		
             		if(query.equals("memberInfo")) {
             			String nickName = in.readUTF();
@@ -192,17 +219,24 @@ public class Server {
             			resout.writeUTF("game start");
             			out.writeUTF("game start");
             			
-            			GameUser user1 = new GameUser(myNickName, out);
+            			GameUser user1 = new GameUser(name, out);
             			GameUser user2 = new GameUser(oppNickName, (DataOutputStream)waitingList.get(oppNickName));
             			GamersList.add(user1);
             			GamersList.add(user2);
             			roomManger.CreateRoom(user1, user2);
+            			
+            			
+            			System.out.println(RoomManager.roomList.get(0).user1.nickName);
+        				System.out.println(RoomManager.roomList.get(0).user2.nickName);
+            			
+            			oppSocket = user2.socket;
             		}
             		
             		else if(query.equals("no")) {
             			String oppNickName = in.readUTF();
             			DataOutputStream resout = (DataOutputStream)waitingList.get(oppNickName);
             			resout.writeUTF("rejected");
+            			resout.writeUTF(oppNickName);
             		}
             		
             		else if (query.equals("chat")) {
@@ -211,26 +245,42 @@ public class Server {
             	}
             	
             	else {
-            		String query = in.readUTF();
+            		System.out.println(name + query);
+            		
             		int gameRoomNum = 0;
             		
             		for(int i=0; i < RoomManager.roomList.size(); i++) {
-            			if (RoomManager.roomList.get(i).userList.get(0).nickName.equals(name) || RoomManager.roomList.get(i).userList.get(1).nickName.equals(name)) {
+            			if (RoomManager.roomList.get(i).user1.nickName.equals(name) ||
+            					RoomManager.roomList.get(i).user2.nickName.equals(name)) {
             				gameRoomNum = i;
             				break;
             			}
             		}
             		
-            		if(query.equals("chat")) {
+            		if(query.equals("11 chat")) {
             			String msg = in.readUTF();
+            			sendToGameRoom("game chating in", RoomManager.roomList.get(gameRoomNum));
             			sendToGameRoom(msg, RoomManager.roomList.get(gameRoomNum));
             		}
             		
             		else if(query.equals("ready")) {
-            			if(RoomManager.roomList.get(gameRoomNum).checkAllReady())
-            				GameRoomAllReady(RoomManager.roomList.get(gameRoomNum));
+            			RoomManager.roomList.get(gameRoomNum).ready ++;
+            			if(RoomManager.roomList.get(gameRoomNum).checkAllReady()) {
+            				sendTo1("defence", RoomManager.roomList.get(gameRoomNum));
+            			}
             		}
             		
+            		else if (query.equals("how many")) {
+            			RoomManager.roomList.get(gameRoomNum).number = Integer.parseInt(in.readUTF());
+        				sendTo2("attack", RoomManager.roomList.get(gameRoomNum));
+            		}
+            		
+            		else if (query.equals("ans is")) {
+            			RoomManager.roomList.get(gameRoomNum).ans = in.readUTF();
+            			
+            			System.out.println(RoomManager.roomList.get(gameRoomNum).number + RoomManager.roomList.get(gameRoomNum).ans);
+            			sendResult(RoomManager.roomList.get(gameRoomNum));
+            		}
             		
             	}
             }// while(in != null)
@@ -267,8 +317,8 @@ public class Server {
       }
       
       public static void RemoveRoom(GameRoom room) {
-         waitingList.put(room.userList.get(0).nickName, room.userList.get(0).socket);
-         waitingList.put(room.userList.get(1).nickName, room.userList.get(1).socket);
+         waitingList.put(room.user1.nickName, room.user1.socket);
+         waitingList.put(room.user2.nickName, room.user2.socket);
          roomList.remove(room);
          
          System.out.println("Room Deleted!");

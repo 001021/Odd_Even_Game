@@ -1,22 +1,24 @@
 package odd_even_game;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameRoom {
-	List<GameUser> userList;
-	String roomName;
-	boolean ready1 = false, ready2 = false;
+	GameUser user1;
+	GameUser user2;
 	
-	public GameRoom() {	
-		userList = new ArrayList<GameUser>();
-	}
+	int ready = 0;
+	int number = 0;
+	String ans;
+	int odd_even;
+	
+	public GameRoom() {}
 	
 	public GameRoom(GameUser user1, GameUser user2) {
-		userList = new ArrayList<GameUser>();	//input user to <GameUser>
-		userList.add(user1);
-		userList.add(user2);
+		this.user1 = user1;
+		this.user2 = user2;
 		
 //		try {
 //			user1.out.writeUTF("Welcome");
@@ -29,8 +31,27 @@ public class GameRoom {
 	}
 	
 	public boolean checkAllReady() {
-		if(ready1 == true && ready2 == true)
+		if(ready == 2)
 			return true;
 		return false;
+	}
+	
+	public void whoWin() {
+		if(ans.equals("odd"))
+			odd_even = 1;
+		else if (ans.equals("even"))
+			odd_even = 0;
+		
+		try {
+			if(number % 2 == odd_even) {
+				user2.out.writeUTF("you win");
+				user1.out.writeUTF("you lose");
+			 }
+			 else {
+				 user1.out.writeUTF("you win");
+				 user2.out.writeUTF("you lose");
+			 }
+		}
+		catch(Exception e) {}
 	}
 }

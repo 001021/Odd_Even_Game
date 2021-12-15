@@ -53,14 +53,6 @@ public class GameRoomAttackFrame extends JFrame{
 	Socket socket = null;
 	static DataOutputStream out;
 	static DataInputStream in;
-	public boolean isClickReadyBtn = false;
-	public boolean isStart = false;
-	public boolean isEnd = false;
-	public boolean isRightAnswer = false;
-	public int checkReady = 0; // 입장 인원 중 몇 명이 준비 버튼을 눌렀는지 담는 변수
-	public int userTurn = 0; // 접속하는 클라이언트에게 턴을 부여해주는 변수
-	public int selectTurn = 1; // 누가 턴인지 정하는 변수
-	public String clientID; // 클라이언트 아이디를 담는 변수
 
 	/**
 	 * Create the application.
@@ -83,12 +75,6 @@ public class GameRoomAttackFrame extends JFrame{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		setVisible(true);
-		
-		//		JPanel JScrollpane = new JPanel();
-		//		JScrollpane.setBorder(new LineBorder(new Color(0, 0, 0)));
-		//		JScrollpane.setBackground(Color.WHITE);
-		//		JScrollpane.setBounds(10, 12, 340, 217);
-		//		frame.getContentPane().add(JScrollpane);
 
 		pane = new JPanel();
 		display = new JTextArea(11, 30);
@@ -105,7 +91,7 @@ public class GameRoomAttackFrame extends JFrame{
 		sendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					out.writeUTF("chat");
+					out.writeUTF("11 chat");
 					out.writeUTF("[" + nickName + "] " + tfChat.getText() + "\n");
 				} catch (IOException e1) {}
 			}
@@ -125,7 +111,7 @@ public class GameRoomAttackFrame extends JFrame{
 			public void actionPerformed(ActionEvent arg0) {
 
 				try {
-					out.writeUTF("chat");
+					out.writeUTF("11 chat");
 					out.writeUTF("[" + nickName + "] " + tfChat.getText() + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -161,105 +147,14 @@ public class GameRoomAttackFrame extends JFrame{
 				// 버튼 누르면 서버에게 준비 완료되었음을 전송
 				try {
 					out.writeUTF("ready");
+					readyButton.setVisible(false);
+					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
-
-//		String response = "";
-//		while(!response.equals("ready") && !response.equals("no")) {
-//			try {
-//				response = in.readUTF();
-//			} catch (IOException e2) {
-//				// TODO Auto-generated catch block
-//				e2.printStackTrace();
-//			}
-//			System.out.println(response);
-//		}
-//
-//		if(response.equals("ready")) {
-//			readyButton.setVisible(false);
-//		}
-//		else if(response.equals("no")) {
-//			JOptionPane.showMessageDialog(null, "아직 준비 완료가 되지 않았나봅니다!", " 대 결 거 절", JOptionPane.PLAIN_MESSAGE);
-//		}
-
-		
-		//		// 둘 다 준비 완료가 되면
-		//		if (user1.ready == 1 && user2.ready == 2) {
-		//		 // 버튼 사라짐
-		//			readyButton.setVisible(false);
-		//		}
-
-		final String oppMessage = "홀";
-
-		// 공격이 홀을 눌렀을 때
-		JButton btnNewButton = new JButton("\uD640");
-		btnNewButton.setBackground(new Color(224, 255, 255));
-		btnNewButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 60));
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// 서버에 "홀"을 전송
-
-				// 상대방이 고르기를 기다림
-
-				if (oppMessage == "짝") {
-					// 상대방이 짝을 골랐으면
-					JOptionPane.showMessageDialog(null, "공격 성공!");
-					win++;
-				}
-				else {
-					JOptionPane.showMessageDialog(null, "공격 실패!");
-					lose++;
-				}
-
-			}
-		});
-		btnNewButton.setBounds(10, 271, 241, 152);
-		add(btnNewButton);
-
-
-		// 공격이 짝을 눌렀을 때
-		JButton btnNewButton_1 = new JButton("\uC9DD");
-		btnNewButton_1.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 60));
-		btnNewButton_1.setBackground(new Color(224, 255, 255));
-		btnNewButton_1.setBounds(266, 271, 241, 152);
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e1) {
-				if (oppMessage == "홀") {
-					// 서버에 "홀"을 전송
-
-					// 상대방이 고르기를 기다림
-
-					JOptionPane.showMessageDialog(null, "공격 성공!");
-				}
-				else {
-					JOptionPane.showMessageDialog(null, "공격 실패!");
-				}
-			}
-		});
-		add(btnNewButton_1);
-
-		textField = new JTextField();
-		textField.setBounds(10, 228, 290, 31);
-		add(textField);
-		textField.setColumns(10);
-
-//		JButton btnNewButton_2 = new JButton("Send");
-//		btnNewButton_2.setBackground(new Color(230, 230, 250));
-//		btnNewButton_2.setFont(new Font("�ؽ� ǲ����� L", Font.PLAIN, 9));
-//		btnNewButton_2.setBounds(298, 228, 52, 31);
-//		add(btnNewButton_2);
-	}
-
-	private void sendReady() {
-		try {
-			out.writeUTF("ready");
-		} catch (Exception e) {
-		}
-
 	}
 
 	static class ClientReceiver extends Thread {
@@ -282,20 +177,29 @@ public class GameRoomAttackFrame extends JFrame{
 						display.append(in.readUTF());
 						tfChat.selectAll();
 					}
-					else if (query.equals("all ready")) {
-						int result = JOptionPane.showConfirmDialog(null, "상대방 준비 완료! 게임을 시작하시겠습니까?", "준비", JOptionPane.YES_NO_OPTION);
-						if (result == JOptionPane.CLOSED_OPTION) {
-							// 사용자가 "예", "아니오"의 선택 없이 다이얼로그 창을 닫은 경우
-							out.writeUTF("no");
-						}
-						else if (result == JOptionPane.YES_OPTION) {
-							// 예
-							out.writeUTF("ready");
-						}
-						else {
-							// 아니오
-							out.writeUTF("no");
-						}
+					
+					else if (query.equals("defence")) {
+						String num = JOptionPane.showInputDialog("구슬 몇 개 내시겠습니까 ?");
+						out.writeUTF("how many");
+						out.writeUTF(num);
+					}
+					else if (query.equals("attack")) {
+						int YorN = JOptionPane.showConfirmDialog(null, "홀 ? 짝 ?", " 공 격 ", JOptionPane.YES_NO_OPTION);
+                        
+						out.writeUTF("ans is");
+                        if (YorN == 0)
+                           out.writeUTF("odd");
+                        else
+                        	out.writeUTF("even");
+					}
+					
+					else if (query.equals("you win")) {
+						String result = "승리";
+						JOptionPane.showMessageDialog(null, result, " 승 리 ", JOptionPane.PLAIN_MESSAGE);
+					}
+					else if (query.equals("you lose")) {
+						String result = "패배";
+						JOptionPane.showMessageDialog(null, result, " 패 배 ", JOptionPane.PLAIN_MESSAGE);
 					}
 				} catch (IOException e) {}
 			}
