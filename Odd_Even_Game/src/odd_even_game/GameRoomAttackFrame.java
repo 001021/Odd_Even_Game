@@ -139,9 +139,22 @@ public class GameRoomAttackFrame extends JFrame{
 		add(panel_2);
 
 		final JLabel lblNewLabel = new JLabel("상대 정보");
+		final JLabel lblenemy = new JLabel("Nickname: nickname2");
+		final JLabel lblenemywin = new JLabel("Win: 1");
+		final JLabel lblenemylose = new JLabel("Lose: 0");
 		panel_1.add(lblNewLabel);
+		panel_1.add(lblenemy);
+		panel_1.add(lblenemywin);
+		panel_1.add(lblenemylose);
 		final JLabel lblNewLabel2 = new JLabel("내 정보");
 		panel_2.add(lblNewLabel2);
+		final JLabel lblme = new JLabel("Nickname: nickname1");
+		final JLabel lblmewin = new JLabel("Win: 5");
+		final JLabel lblmelose = new JLabel("Lose: 8");
+		panel_2.add(lblme);
+		panel_2.add(lblmewin);
+		panel_2.add(lblmelose);
+		
 
 		final JButton readyButton = new JButton("준비 완료!");
 		readyButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 30));
