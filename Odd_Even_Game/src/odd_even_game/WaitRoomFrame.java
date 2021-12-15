@@ -70,8 +70,8 @@ public class WaitRoomFrame extends JFrame{
 		String col2[] = {"접속 회원 리스트"};
 //		Object[][] tableData = new Object[server.waitingList.keySet().size()][1];
 		
-		Object[][] tableData = { {"Nickname: 0승 0패"}, 
-				{"djWjrh: dp승 dp패"}
+		Object[][] tableData = { {"nickname1: 5승 8패"}, 
+				{"nickname2: 1승 0패"}
 		};
 	
 
