@@ -67,7 +67,7 @@ public class GameRoomAttackFrame extends JFrame{
 		Thread receiver = new Thread(new ClientReceiver(socket));
 		receiver.start();
 		
-		setTitle("[" + nickName + "] 홀짝게임 스타트! - 공격");
+		setTitle("[" + nickName + "] 홀짝게임 스타트!");
 		setSize(523, 460);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -129,18 +129,32 @@ public class GameRoomAttackFrame extends JFrame{
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_1.setBackground(Color.WHITE);
-		panel_1.setBounds(360, 12, 147, 247);
+		panel_1.setBounds(360, 12, 147, 123);
 		add(panel_1);
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel_2.setBackground(Color.WHITE);
+		panel_2.setBounds(360, 137, 147, 123);
+		add(panel_2);
 
-		JLabel lblNewLabel = new JLabel("\uD68C\uC6D0 \uC815\uBCF4 \uBCF4\uAE30");
+		JLabel lblNewLabel = new JLabel("상대 정보");
 		panel_1.add(lblNewLabel);
+		JLabel lblNewLabel2 = new JLabel("내 정보");
+		panel_2.add(lblNewLabel2);
 
 		final JButton readyButton = new JButton("준비 완료!");
 		readyButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 30));
 		readyButton.setBackground(new Color(200, 200, 255));
-		readyButton.setBounds(10, 270, 497, 155);
+		readyButton.setBounds(10, 270, 250, 155);
+		
+		final JButton WaitingRoomButton = new JButton("대기실로!");
+		WaitingRoomButton.setFont(new Font("넥슨 풋볼고딕 B", Font.PLAIN, 30));
+		WaitingRoomButton.setBackground(new Color(200, 255, 200));
+		WaitingRoomButton.setBounds(265, 270, 247, 155);
 
 		add(readyButton);
+		add(WaitingRoomButton);
 
 		readyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
@@ -155,7 +169,16 @@ public class GameRoomAttackFrame extends JFrame{
 				}
 			}
 		});
+		
+		WaitingRoomButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				// 버튼 누르면 대기실로
+				dispose();
+			}
+		});
 	}
+	
+	
 
 	static class ClientReceiver extends Thread {
 		Socket socket;

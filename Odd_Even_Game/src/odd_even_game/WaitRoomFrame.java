@@ -58,7 +58,15 @@ public class WaitRoomFrame extends JFrame{
 //		private JList<Set<String>> = server.waitingList;
 //		Collection<Object> keySet = server.waitingList.values();
 //		userList = new JList(keySet);
-
+//		Object[][] tableData = { {"a", "a", "0"},
+//				{"b", "b", "0"},
+//				{"c", "c", "1"}
+//		};
+		
+//		int indext = 0;
+//		for (String key : server.waitingList.keySet()) {
+//			
+//		}
 		String col2[] = {"ID", "Nickname", "Record"}; // 아이디, 대화명, 게임 전적
 		Object[][] tableData = new Object[server.waitingList.keySet().size()][3];
 		
@@ -77,23 +85,13 @@ public class WaitRoomFrame extends JFrame{
 			index++;
 		}
 		
-		System.out.println(ID);
-		
 		for (int i = 0 ; i < index; i++) {
 			tableData[i][0] = ID[i];
 			tableData[i][1] = Nickname[i];
 			tableData[i][2] = Record[i];
 		}
 		
-//		Object[][] tableData = { {"a", "a", "0"},
-//				{"b", "b", "0"},
-//				{"c", "c", "1"}
-//		};
-		
-//		int indext = 0;
-//		for (String key : server.waitingList.keySet()) {
-//			
-//		}
+
 		
 		model2 = new DefaultTableModel(tableData, col2);
 
@@ -162,10 +160,7 @@ public class WaitRoomFrame extends JFrame{
 					out.writeUTF(oppID);
 
 					JOptionPane.showMessageDialog(null, oppID + "님에게 대결을 신청했습니다!", " 대 결 신 청", JOptionPane.PLAIN_MESSAGE);
-					
-					String result = in.readUTF();
-					while (result != "Room Created") result = in.readUTF();
-					if(result.equals("Room Created!")) dispose();
+
 				} catch (IOException e) {}
 			}
 		});
@@ -275,7 +270,7 @@ public class WaitRoomFrame extends JFrame{
 					}
 
 					if(query.equals("game start")) {
-						JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", "[" + nickName + "] 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
+						//JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", "[" + nickName + "] 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
 						new GameRoomAttackFrame(socket, nickName);
 					}
 					else if(query.equals("rejected")) {

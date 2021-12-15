@@ -168,6 +168,7 @@ public class Server {
                     		out.writeUTF(db.getNickName(id));
                     		loginList.remove(name);
                     		waitingList.put(db.getNickName(id), out);
+                    		
                     		name = db.getNickName(id);
                     	}
                     	else
