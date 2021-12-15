@@ -87,7 +87,7 @@ public class GameRoomAttackFrame extends JFrame{
 
 
 		tfChat = new JTextField(25);
-		JButton sendBtn = new JButton("send");
+		final JButton sendBtn = new JButton("send");
 		sendBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -126,21 +126,21 @@ public class GameRoomAttackFrame extends JFrame{
 		tfChat.getActionMap().put("ENTER", ok);
 
 
-		JPanel panel_1 = new JPanel();
+		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_1.setBackground(Color.WHITE);
 		panel_1.setBounds(360, 12, 147, 123);
 		add(panel_1);
 		
-		JPanel panel_2 = new JPanel();
+		final JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_2.setBackground(Color.WHITE);
 		panel_2.setBounds(360, 137, 147, 123);
 		add(panel_2);
 
-		JLabel lblNewLabel = new JLabel("상대 정보");
+		final JLabel lblNewLabel = new JLabel("상대 정보");
 		panel_1.add(lblNewLabel);
-		JLabel lblNewLabel2 = new JLabel("내 정보");
+		final JLabel lblNewLabel2 = new JLabel("내 정보");
 		panel_2.add(lblNewLabel2);
 
 		final JButton readyButton = new JButton("준비 완료!");
@@ -162,6 +162,17 @@ public class GameRoomAttackFrame extends JFrame{
 				try {
 					out.writeUTF("ready");
 					readyButton.setVisible(false);
+					WaitingRoomButton.setVisible(false);
+					panel_2.setVisible(false);
+					lblNewLabel2.setVisible(false);
+					panel_1.setVisible(false);
+					lblNewLabel.setVisible(false);
+					tfChat.setVisible(false);
+					display.setVisible(false);
+					pane.setVisible(false);
+					inputPane.setVisible(false);
+					sendBtn.setVisible(false);
+					contentPane.setVisible(false);
 					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

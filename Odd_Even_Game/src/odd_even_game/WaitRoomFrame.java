@@ -270,7 +270,7 @@ public class WaitRoomFrame extends JFrame{
 					}
 
 					if(query.equals("game start")) {
-						//JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", "[" + nickName + "] 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
+						JOptionPane.showMessageDialog(null, "대결 성사! 게임방으로 이동합니다!", "[" + nickName + "] 대 결 성 사", JOptionPane.PLAIN_MESSAGE);
 						new GameRoomAttackFrame(socket, nickName);
 					}
 					else if(query.equals("rejected")) {
